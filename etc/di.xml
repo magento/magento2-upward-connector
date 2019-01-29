@@ -10,7 +10,8 @@
     <preference for="Magento\Framework\App\FrontControllerInterface" type="Magento\UpwardConnector\Controller\Upward" />
     <type name="Magento\Upward\Controller">
         <arguments>
-            <argument name="upwardConfig" xsi:type="string">pwa/upward-config.yml</argument>
+            <argument name="request" xsi:type="object">Magento\Framework\App\RequestInterface</argument>
+            <argument name="environment" xsi:type="string">/app/node_modules/@magento/venia-concept/venia-upward.yml</argument>
         </arguments>
     </type>
 </config>
