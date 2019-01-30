@@ -11,7 +11,6 @@ use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\HTTP\PhpEnvironment\Response;
-use Magento\Upward\Controller as UpwardController;
 
 class Upward implements FrontControllerInterface
 {
@@ -21,20 +20,18 @@ class Upward implements FrontControllerInterface
     private $response;
 
     /**
-     * @var UpwardController
+     * @var UpwardControllerFactory
      */
-    private $upwardController;
+    private $upwardFactory;
 
     /**
      * @param Response $response
-     * @param UpwardController $upwardController
+     * @param UpwardControllerFactory $upwardFactory
      */
-    public function __construct(
-        Response $response,
-        UpwardController $upwardController
-    ) {
+    public function __construct(Response $response, UpwardControllerFactory $upwardFactory)
+    {
         $this->response = $response;
-        $this->upwardController = $upwardController;
+        $this->upwardFactory = $upwardFactory;
     }
 
     /**
@@ -46,10 +43,12 @@ class Upward implements FrontControllerInterface
     public function dispatch(RequestInterface $request)
     {
         /** @var \Zend\Http\Response $upwardResponse */
-        $upwardResponse = ($this->upwardController)();
+        $upwardResponse = $this->upwardFactory->create($request)();
+
         $this->response->setHeaders($upwardResponse->getHeaders());
         $this->response->setStatusCode($upwardResponse->getStatusCode());
         $this->response->setContent($upwardResponse->getContent());
+
         return $this->response;
     }
 }
