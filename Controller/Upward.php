@@ -11,6 +11,7 @@ use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\HTTP\PhpEnvironment\Response;
+use Zend\Http\Response\Stream;
 
 class Upward implements FrontControllerInterface
 {
@@ -44,10 +45,11 @@ class Upward implements FrontControllerInterface
     {
         /** @var \Zend\Http\Response $upwardResponse */
         $upwardResponse = $this->upwardFactory->create($request)();
+        $content = $upwardResponse instanceof Stream ? $upwardResponse->getBody() : $upwardResponse->getContent();
 
         $this->response->setHeaders($upwardResponse->getHeaders());
         $this->response->setStatusCode($upwardResponse->getStatusCode());
-        $this->response->setContent($upwardResponse->getContent());
+        $this->response->setContent($content);
 
         return $this->response;
     }
