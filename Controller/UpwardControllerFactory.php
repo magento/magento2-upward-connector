@@ -40,12 +40,12 @@ class UpwardControllerFactory
      */
     public function create(RequestInterface $request): UpwardController
     {
-        $configPath = getenv(static::VAR_UPWARD_CONFIG);
+        $upwardConfig = getenv(static::VAR_UPWARD_CONFIG);
 
-        if (empty($configPath)) {
+        if (empty($upwardConfig)) {
             throw new \RuntimeException('Environment variable ' . static::VAR_UPWARD_CONFIG . 'not set.');
         }
 
-        return $this->objectManager->create(UpwardController::class, [$request, $configPath]);
+        return $this->objectManager->create(UpwardController::class, compact('request', 'upwardConfig'));
     }
 }
