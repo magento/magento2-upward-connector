@@ -51,7 +51,7 @@ class UpwardControllerFactory
         $upwardConfig = $this->deploymentConfig->get(self::UPWARD_CONFIG_PATH);
 
         if (empty($upwardConfig)) {
-            throw new \RuntimeException('Environment variable ' . static::VAR_UPWARD_CONFIG . ' not set.');
+            throw new \RuntimeException('Environment variable ' . self::UPWARD_CONFIG_PATH . ' not set.');
         }
 
         return $this->objectManager->create(UpwardController::class, compact('request', 'upwardConfig'));
