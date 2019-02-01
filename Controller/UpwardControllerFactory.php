@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Controller;
 
-use Magento\Framework\App\DeploymentConfig;
+use Magento\UpwardConnector\Helper\Data;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
@@ -15,14 +15,9 @@ use Magento\Upward\Controller as UpwardController;
 class UpwardControllerFactory
 {
     /**
-     * Deployment config path where UPWARD config file path is found.
+     * @var Data
      */
-    public const UPWARD_CONFIG_PATH = 'upward/path';
-
-    /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
+    private $helper;
 
     /**
      * @var DeploymentConfig
@@ -31,12 +26,12 @@ class UpwardControllerFactory
 
     /**
      * @param ObjectManagerInterface $objectManager
-     * @param DeploymentConfig $deploymentConfig
+     * @param Data $configHelper
      */
-    public function __construct(ObjectManagerInterface $objectManager, DeploymentConfig $deploymentConfig)
+    public function __construct(ObjectManagerInterface $objectManager, Data $configHelper)
     {
         $this->objectManager = $objectManager;
-        $this->deploymentConfig = $deploymentConfig;
+        $this->helper = $configHelper;
     }
 
     /**
@@ -48,10 +43,10 @@ class UpwardControllerFactory
      */
     public function create(RequestInterface $request): UpwardController
     {
-        $upwardConfig = $this->deploymentConfig->get(self::UPWARD_CONFIG_PATH);
+        $upwardConfig = $this->helper->getConfigPath();
 
         if (empty($upwardConfig)) {
-            throw new \RuntimeException('Environment variable ' . self::UPWARD_CONFIG_PATH . ' not set.');
+            throw new \RuntimeException('Path to UPWARD configuration file not set.');
         }
 
         return $this->objectManager->create(UpwardController::class, compact('request', 'upwardConfig'));
