@@ -48,7 +48,7 @@ class UpwardControllerFactory
      */
     public function create(RequestInterface $request): UpwardController
     {
-        $upwardConfig = $this->scopeConfig->getValue(
+        $upwardConfig = $this->config->getValue(
             static::UPWARD_CONFIG_PATH,
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT
         );
