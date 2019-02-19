@@ -25,7 +25,7 @@ Add your PWA Studio storefront to the list of dependencies in this file.
 ```json
 {
   "dependencies": {
-    "@magento/venia-concept": "^2.0.0-rc.19"
+    "@magento/venia-concept": "~2.0.0"
   }
 }
 ```
@@ -48,8 +48,8 @@ Add the repository information for the UPWARD PHP server and UPWARD Connector to
 To have composer install these packages, add them to the `require` section of the `composer.json` file.
 
 ```json
-"magento/module-upward-connector": "dev-test-cloud-integration",
-"magento/upward": "dev-master"
+"magento/module-upward-connector": "^1.0.0",
+"magento/upward": "^1.0.0"
 ```
 
 <!--
