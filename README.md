@@ -10,7 +10,7 @@
   You are not required to publish to npmjs.com, but
   NPM or Yarn should be able to access your project code through Git.
 
-  For this tutorial, the [`venia-concept`][] package for the [Venia storefront][] is used.
+  For this tutorial, the [`venia-concept`][] package for the [Venia storefront][] is used, but any PWA available though NPM with an UPWARD compatible YAML file is supported.
 
 ## Add node package dependency
 
