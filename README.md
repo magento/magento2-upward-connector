@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- A dev, starter, or pro tier Magento Cloud project
+- An existing Magento Cloud project
 - Composer
 - Yarn or NPM
 - A [Magento PWA Studio][] storefront managed by NPM or Yarn.
@@ -10,7 +10,7 @@
   You are not required to publish to npmjs.com, but
   NPM or Yarn should be able to access your project code through Git.
 
-  For this tutorial, the [`venia-concept`][] package for the [Venia storefront][] is used, but any PWA available though NPM with an UPWARD compatible YAML file is supported.
+  For this tutorial, the [`@magento/venia-concept`][] package for the [Venia storefront][] is used, but any PWA available though NPM with an UPWARD compatible YAML file is supported.
 
 ## Add node package dependency
 
@@ -32,6 +32,8 @@ Add your PWA Studio storefront to the list of dependencies in this file.
 
 ## Add Composer dependencies
 
+### Option 1: Git based
+
 Add the repository information for the UPWARD PHP server and UPWARD Connector to the `repositories` section in your `composer.json`.
 
 ```json
@@ -52,16 +54,26 @@ To have composer install these packages, add them to the `require` section of th
 "magento/upward": "^1.0.0"
 ```
 
-<!--
-* TODO: change `dev-test-cloud-integration` to `dev-master` when it is merged
-* TODO: Remove instructions for adding repository locations after they have been published on Packagist.org and/or packages.magento.com
-* TODO: After the packages are published, remove any mention of specifying a version for `magento/upward` as it will be included with `magento/module-upward-connector`
-* TODO: After publishing, make sure the version of `magento/module-upward-connector` matches the actual version i.e. `^2.3` or `*`
--->
+### Option 2: Package based
+
+Add the repository information for the Magento package service to the `repositories` section in your `composer.json`.
+
+```json
+"repo": {
+    "type": "composer",
+    "url": "https://repo.magento.com/"
+}
+```
+
+Add package to the `require` section of the `composer.json` file.
+
+```json
+"magento/module-upward-connector": "^1.0.0"
+```
 
 ## Add Venia sample data (optional)
 
-The Venia storefront works best with the Venia sample data installed.
+The Venia storefront works best with the Venia sample data installed. There is an [automated script](https://magento-research.github.io/pwa-studio/venia-pwa-concept/install-sample-data/) in the `@magento/venia-concept` package, or you can follow the manual steps here. 
 
 If you are deploying your own custom storefront, you may skip this step and continue to the next section.
 
@@ -183,11 +195,11 @@ The following table lists the required environment variables for the Venia store
 
 | Name                                                    | Value                                                       |
 | ------------------------------------------------------- | ----------------------------------------------------------- |
-| `CONFIG__DEFAULT__WEB__UPWARD__PATH` | `/app/node_modules/@magento/venia-concept/venia-upward.yml` |
+| `CONFIG__DEFAULT__WEB__UPWARD__PATH` | `/app/node_modules/@magento/venia-concept/venia-upward.yml` (absolute path to UPWARD YAML configuration) |
 | `NODE_ENV`                                              | `production`                                                |
 | `MAGENTO_BACKEND_URL` | `https://[your-cloud-url-here]` |
-
-<!-- TODO: Update MAGENTO_BACKEND_URL entry when a future release makes it dynamically determined -->
+| `USE_FASTLY` | `0 / 1` (dependent on Cloud environment) |
+| `BRAINTREE_TOKEN` | `<generated token from Braintree>` |
 
 ## Commit modified files
 
@@ -213,6 +225,6 @@ You have installed a PWA storefront on the Cloud.
 You should be able to navigate to your Cloud instance and see your storefront.
 
 [magento pwa studio]: http://pwastudio.io
-[`venia-concept`]: https://www.npmjs.com/package/@magento/venia-concept
+[`@magento/venia-concept`]: https://www.npmjs.com/package/@magento/venia-concept
 [venia storefront]: https://magento-research.github.io/pwa-studio/venia-pwa-concept/
 [create a `package.json`]: https://docs.npmjs.com/cli/init
