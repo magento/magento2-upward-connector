@@ -1,19 +1,13 @@
 {
     "name": "magento/module-upward-connector",
-    "description": "N/A",
+    "description": "Magento module used for routing all frontend requests through UPWARD-PHP.",
     "config": {
         "sort-packages": true
-    },
-    "repositories": {
-        "upward": {
-            "type": "git",
-            "url": "https://github.com/magento-research/upward-php.git"
-        }
     },
     "require": {
         "php": "~7.1.3||~7.2.0",
         "magento/framework": "^102.0",
-        "magento/upward": "dev-master"
+        "magento/upward": "^1.0.0"
     },
     "type": "magento2-module",
     "license": [
