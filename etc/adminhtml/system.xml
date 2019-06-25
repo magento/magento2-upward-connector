@@ -11,12 +11,22 @@
         <section id="web">
             <group id="upward" translate="label" type="text" sortOrder="300"
                 showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>UPWARD Configuration</label>
+                <label>UPWARD PWA Configuration</label>
                 <field id="config_path" type="text" translate="label,comment"
-                    sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>UPWARD Config File</label>
                     <config_path>web/upward/path</config_path>
                     <comment>Server path to YAML configuration file for UPWARD</comment>
+                </field>
+                <field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label,comment" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enabled PWA frontend for this store</comment>
+                </field>
+                <field id="front_names_to_skip" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label,comment" type="textarea">
+                    <label>Front Names to skip</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Separated bij newline. You can load certain url's from the default magento frontend.</comment>
                 </field>
             </group>
         </section>
