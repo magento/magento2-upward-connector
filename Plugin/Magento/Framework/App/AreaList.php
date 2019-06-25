@@ -43,20 +43,24 @@ class AreaList
         $result,
         $frontName
     ) {
+
+        if ($result != 'frontend') {
+            return $result;
+        }
+
         $frontNamesToSkip = explode(
-            '\n',
+            "\r\n",
             $this->scopeConfig->getValue(
                 self::UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP,
                 ScopeInterface::SCOPE_STORE
             )
         );
 
-        if ($result == 'frontend' && in_array($frontName, $frontNamesToSkip)) {
+        if (in_array($frontName, $frontNamesToSkip)) {
             return $result;
         }
 
-        if ($result == 'frontend' &&
-            $this->scopeConfig->getValue(
+        if ($this->scopeConfig->getValue(
                 self::UPWARD_CONFIG_PATH_ENABLED,
                 ScopeInterface::SCOPE_STORE
             )
