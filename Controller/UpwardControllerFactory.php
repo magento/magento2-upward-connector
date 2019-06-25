@@ -79,7 +79,7 @@ class UpwardControllerFactory
      */
     public function getMagentoBackendUrl(): string
     {
-        $protocol = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'on' ? 'https' : 'http';
+        $protocol = isset($_SERVER['HTTPS']) ? 'https' : 'http';
         return "{$protocol}://{$_SERVER['HTTP_HOST']}";
     }
 
