@@ -1,4 +1,9 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Plugin\Magento\Framework\App;
 
@@ -13,30 +18,23 @@ class AreaList
     protected $scopeConfig;
 
     /**
-     * Enable Pwa frontend for a certain storeview
-     */
-    public const UPWARD_CONFIG_PATH_ENABLED = 'web/upward/enabled';
-
-    /**
      * Controller or frontname to load from default magento frontend
      */
     public const UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP = 'web/upward/front_names_to_skip';
 
     /**
-     * AreaList constructor.
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(
-        ScopeConfigInterface $scopeConfig
-    ) {
+    public function __construct(ScopeConfigInterface $scopeConfig) {
         $this->scopeConfig = $scopeConfig;
     }
 
     /**
      * @param \Magento\Framework\App\AreaList $subject
-     * @param $result
-     * @param $frontName
-     * @return string
+     * @param string|null $result
+     * @param string $frontName
+     * 
+     * @return string|null
      */
     public function afterGetCodeByFrontName(
         \Magento\Framework\App\AreaList $subject,
@@ -60,14 +58,6 @@ class AreaList
             return $result;
         }
 
-        if ($this->scopeConfig->getValue(
-                self::UPWARD_CONFIG_PATH_ENABLED,
-                ScopeInterface::SCOPE_STORE
-            )
-        ) {
-            return 'pwa';
-        }
-
-        return $result;
+        return 'pwa';
     }
 }

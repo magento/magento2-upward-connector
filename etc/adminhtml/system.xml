@@ -18,15 +18,9 @@
                     <config_path>web/upward/path</config_path>
                     <comment>Server path to YAML configuration file for UPWARD</comment>
                 </field>
-                <field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label,comment" type="select">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Enabled PWA frontend for this store</comment>
-                </field>
                 <field id="front_names_to_skip" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label,comment" type="textarea">
-                    <label>Front Names to skip</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Separated bij newline. You can load certain url's from the default magento frontend.</comment>
+                    <label>Front Name Whitelist</label>
+                    <comment>Line break separated list of URL's that will load the default Magento frontend.</comment>
                 </field>
             </group>
         </section>

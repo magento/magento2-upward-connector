@@ -11,7 +11,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
-use Magento\Framework\App\State;
 
 class UpwardControllerFactory
 {
@@ -31,23 +30,13 @@ class UpwardControllerFactory
     private $objectManager;
 
     /**
-     * @var State
-     */
-    private $appState;
-
-    /**
      * @param ObjectManagerInterface $objectManager
      * @param ScopeConfigInterface $scopeConfig
-     * @param State $appState
      */
-    public function __construct(
-        ObjectManagerInterface $objectManager,
-        ScopeConfigInterface $scopeConfig,
-        State $appState
-    ) {
+    public function __construct(ObjectManagerInterface $objectManager, ScopeConfigInterface $scopeConfig)
+    {
         $this->objectManager = $objectManager;
         $this->config = $scopeConfig;
-        $this->appState = $appState;
     }
 
     /**
@@ -64,30 +53,10 @@ class UpwardControllerFactory
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT
         );
 
-        $_SERVER['MAGENTO_BACKEND_URL'] = $this->getMagentoBackendUrl();
-        $_SERVER['NODE_ENV'] = $this->getMode();
-
         if (empty($upwardConfig)) {
             throw new \RuntimeException('Path to UPWARD configuration file not set.');
         }
 
         return $this->objectManager->create(UpwardController::class, compact('request', 'upwardConfig'));
-    }
-
-    /**
-     * @return string
-     */
-    public function getMagentoBackendUrl(): string
-    {
-        $protocol = isset($_SERVER['HTTPS']) ? 'https' : 'http';
-        return "{$protocol}://{$_SERVER['HTTP_HOST']}";
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMode()
-    {
-        return $this->appState->getMode();
     }
 }
