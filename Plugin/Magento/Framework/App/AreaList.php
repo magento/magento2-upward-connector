@@ -51,10 +51,10 @@ class AreaList
             $this->scopeConfig->getValue(
                 self::UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP,
                 ScopeInterface::SCOPE_STORE
-            )
+            ) ?? ''
         );
 
-        if (in_array($frontName, $frontNamesToSkip)) {
+        if ($frontName && in_array($frontName, $frontNamesToSkip)) {
             return $result;
         }
 
