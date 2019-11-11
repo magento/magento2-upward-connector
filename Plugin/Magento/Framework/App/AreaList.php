@@ -47,7 +47,7 @@ class AreaList
         }
 
         $frontNamesToSkip = explode(
-            "\r\n",
+            PHP_EOL,
             $this->scopeConfig->getValue(
                 self::UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP,
                 ScopeInterface::SCOPE_STORE
