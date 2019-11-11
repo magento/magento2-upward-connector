@@ -33,7 +33,7 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
         $this->areaListMock = $this->createMock(\Magento\Framework\App\AreaList::class);
 
         $this->scopeConfig->expects($this->any())->method('getValue')->willReturn(
-            'foo' . PHP_EOL . 'bar'
+            'foo\r\nbar'
         );
 
         $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
