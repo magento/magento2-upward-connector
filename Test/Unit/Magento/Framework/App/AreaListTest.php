@@ -33,7 +33,7 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
         $this->areaListMock = $this->createMock(\Magento\Framework\App\AreaList::class);
 
         $this->scopeConfig->expects($this->any())->method('getValue')->willReturn(
-            'foo\r\nbar'
+            "foo\r\nbar"
         );
 
         $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
@@ -46,7 +46,7 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
      * @param string $resultParam
      * @param string $frontNameParam
      * @param string $expected
-     * 
+     *
      * @dataProvider afterGetCodeByFrontNameDataProvider
      */
     public function testAfterGetCodeByFrontName(string $resultParam, string $frontNameParam, string $expected)

@@ -25,7 +25,8 @@ class AreaList
     /**
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(ScopeConfigInterface $scopeConfig) {
+    public function __construct(ScopeConfigInterface $scopeConfig)
+    {
         $this->scopeConfig = $scopeConfig;
     }
 
@@ -33,7 +34,7 @@ class AreaList
      * @param \Magento\Framework\App\AreaList $subject
      * @param string|null $result
      * @param string $frontName
-     * 
+     *
      * @return string|null
      */
     public function afterGetCodeByFrontName(
@@ -47,7 +48,7 @@ class AreaList
         }
 
         $frontNamesToSkip = explode(
-            '\r\n',
+            "\r\n",
             $this->scopeConfig->getValue(
                 self::UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP,
                 ScopeInterface::SCOPE_STORE

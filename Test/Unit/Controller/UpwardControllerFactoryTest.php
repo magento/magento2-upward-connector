@@ -70,6 +70,5 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Path to UPWARD configuration file not set.');
         $this->upwardControllerFactory->create($requestMock);
-
     }
 }
