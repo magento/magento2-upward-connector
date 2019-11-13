@@ -15,6 +15,6 @@
                 </item>
             </argument>
         </arguments>
-        <plugin disabled="false" name="Magento_UpwardConnector_Plugin_Magento_Framework_App_AreaList" sortOrder="10" type="Magento\UpwardConnector\Plugin\Magento\Framework\App\AreaList"/>
+        <plugin name="upward_connector_app_areaList" sortOrder="10" type="Magento\UpwardConnector\Plugin\Magento\Framework\App\AreaList" />
     </type>
 </config>

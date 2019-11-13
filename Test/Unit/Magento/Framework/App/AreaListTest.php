@@ -37,9 +37,10 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
         );
 
         $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
-        $this->areaListPlugin = $objectManagerHelper->getObject(AreaListPlugin::class, [
-            'scopeConfig' => $this->scopeConfig
-        ]);
+        $this->areaListPlugin = $objectManagerHelper->getObject(
+            AreaListPlugin::class,
+            ['scopeConfig' => $this->scopeConfig]
+        );
     }
 
     /**

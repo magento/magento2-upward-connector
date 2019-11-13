@@ -15,12 +15,12 @@ class AreaList
     /**
      * @var ScopeConfigInterface
      */
-    protected $scopeConfig;
+    private $scopeConfig;
 
     /**
      * Controller or frontname to load from default magento frontend
      */
-    public const UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP = 'web/upward/front_names_to_skip';
+    const UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP = 'web/upward/front_names_to_skip';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
