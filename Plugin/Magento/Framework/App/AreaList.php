@@ -48,7 +48,7 @@ class AreaList
         $frontName
     ) {
 
-        if ($result != 'frontend' && $this->scopeConfig->getValue(self::UPWARD_CONFIG_PATH_ENABLE,ScopeInterface::SCOPE_WEBSITE) ) {
+        if ($result != 'frontend' && !$this->scopeConfig->getValue(self::UPWARD_CONFIG_PATH_ENABLE,ScopeInterface::SCOPE_WEBSITE) ) {
             return $result;
         }
 
