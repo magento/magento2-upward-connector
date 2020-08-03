@@ -36,5 +36,5 @@ privacy-policy-cookie-restriction-mode
 
 With this example, when a visitor navigates to either `<Magento store URL>/contact` or `<Magento store URL>/privacy-policy-cookie-restriction-mode`, they will land on a page rendered by Magento instead of the storefront application.
 
-[upward-php]: https://github.com/magento-research/upward-php
+[upward-php]: https://github.com/magento/upward-php
 [magento cloud deployment]: http://pwastudio.io/tutorials/cloud-deploy/
