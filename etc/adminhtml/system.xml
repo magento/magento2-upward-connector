@@ -12,8 +12,11 @@
             <group id="upward" translate="label" type="text" sortOrder="300"
                 showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>UPWARD PWA Configuration</label>
-                <field id="config_path" type="text" translate="label,comment"
-                    sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Module Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="config_path" type="text" translate="label,comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>UPWARD Config File</label>
                     <config_path>web/upward/path</config_path>
                     <comment>Server path to YAML configuration file for UPWARD</comment>

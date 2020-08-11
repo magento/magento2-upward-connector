@@ -23,6 +23,11 @@ class AreaList
     const UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP = 'web/upward/front_names_to_skip';
 
     /**
+     * Information about module is activate
+     */
+    const UPWARD_CONFIG_PATH_ENABLE = 'web/upward/enable';
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(ScopeConfigInterface $scopeConfig)
@@ -43,7 +48,7 @@ class AreaList
         $frontName
     ) {
 
-        if ($result != 'frontend') {
+        if ($result != 'frontend' && !$this->scopeConfig->getValue(self::UPWARD_CONFIG_PATH_ENABLE,ScopeInterface::SCOPE_WEBSITE) ) {
             return $result;
         }
 
