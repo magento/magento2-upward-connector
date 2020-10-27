@@ -8,106 +8,34 @@ declare(strict_types=1);
 namespace Magento\UpwardConnector\Model;
 
 use Magento\Framework\HTTP\ZendClientFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Prerender
 {
-    /**
-     * Should be moved to config
-     * @var
-     */
-    private $prerenderToken = null;
+    const XML_PATH_WEB_UPWARD_PRERENDER = 'web/upward/prerender_enabled';
+    const XML_PATH_WEB_UPWARD_PRERENDER_TOKEN = 'web/upward/prerender_token';
+    const XML_PATH_WEB_UPWARD_PRERENDER_URL = 'web/upward/prerender_url';
+    const XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS = 'web/upward/prerender_crawlers';
+    const XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST = 'web/upward/prerender_allowed_list';
+    const XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST = 'web/upward/prerender_blocked_list';
 
     /**
-     * Should be moved to config
-     * @var
+     * @var ScopeConfigInterface
      */
-    private $prerenderUri = 'http://localhost:3000';
-    //private $prerenderUri = 'https://service.prerender.io';
-
-    /**
-     * @var
-     */
-    private $crawlerUserAgents = [
-        'googlebot',
-        'yahoo',
-        'bingbot',
-        'yandex',
-        'baiduspider',
-        'facebookexternalhit',
-        'twitterbot',
-        'rogerbot',
-        'linkedinbot',
-        'embedly',
-        'quora link preview',
-        'showyoubot',
-        'outbrain',
-        'pinterest',
-        'developers.google.com/+/web/snippet',
-        'slackbot',
-    ];
-
-    /**
-     * @var
-     */
-    private $whitelist = [];
-
-    /**
-     * @var
-     */
-    private $blacklist = [
-        '*.js',
-        '*.css',
-        '*.xml',
-        '*.less',
-        '*.png',
-        '*.jpg',
-        '*.jpeg',
-        '*.svg',
-        '*.gif',
-        '*.pdf',
-        '*.doc',
-        '*.txt',
-        '*.ico',
-        '*.rss',
-        '*.zip',
-        '*.mp3',
-        '*.rar',
-        '*.exe',
-        '*.wmv',
-        '*.doc',
-        '*.avi',
-        '*.ppt',
-        '*.mpg',
-        '*.mpeg',
-        '*.tif',
-        '*.wav',
-        '*.mov',
-        '*.psd',
-        '*.ai',
-        '*.xls',
-        '*.mp4',
-        '*.m4a',
-        '*.swf',
-        '*.dat',
-        '*.dmg',
-        '*.iso',
-        '*.flv',
-        '*.m4v',
-        '*.torrent',
-        '*.eot',
-        '*.ttf',
-        '*.otf',
-        '*.woff',
-        '*.woff2',
-        '*.json'
-    ];
+    private $config;
 
     /**
      * @param ZendClientFactory $httpClientFactory
+     * @param ScopeConfigInterface $config
      */
-    public function __construct(ZendClientFactory $httpClientFactory)
+    public function __construct(
+        ZendClientFactory $httpClientFactory,
+        ScopeConfigInterface $config
+    )
     {
         $this->httpClientFactory = $httpClientFactory;
+        $this->config = $config;
     }
 
     public function getPrerenderedPageResponse($request)
@@ -115,19 +43,19 @@ class Prerender
         $headers = [
             'User-Agent' => $request->getServer('HTTP_USER_AGENT'),
         ];
-        if ($this->prerenderToken) {
-            $headers['X-Prerender-Token'] = $this->prerenderToken;
+        if ($this->getPrerenderToken()) {
+            $headers['X-Prerender-Token'] = $this->getPrerenderToken();
         }
 
         $protocol = $request->isSecure() ? 'https' : 'http';
 
         $host = $request->getHttpHost();
         $path = $request->getRequestUri();
-        // Fix "//" 404 error
+        // Fix '//' 404 error
         if ($path === '/') {
             $path = '';
         }
-        $url = $this->prerenderUri  . '/' . $protocol.'://'.$host . $path;
+        $url = $this->getPrerenderUrl() . '/' . $protocol . '://' . $host . $path;
 
         $clientConfig = [
             'maxredirects' => 10,
@@ -145,6 +73,15 @@ class Prerender
 
     public function shouldShowPrerenderedPage($request)
     {
+        if (
+            !$this->config->getValue(
+                static::XML_PATH_WEB_UPWARD_PRERENDER,
+                ScopeInterface::SCOPE_STORE) ||
+            !$this->getPrerenderUrl()
+        ) {
+            return false;
+        }
+
         $userAgent = strtolower($request->getServer('HTTP_USER_AGENT'));
         $bufferAgent = $request->getServer('X-BUFFERBOT');
 
@@ -165,7 +102,7 @@ class Prerender
             $isRequestingPrerenderedPage = true;
         }
 
-        foreach ($this->crawlerUserAgents as $crawlerUserAgent) {
+        foreach ($this->getCrawlerUserAgents() as $crawlerUserAgent) {
             if (strpos(strtolower($userAgent), strtolower($crawlerUserAgent)) !== false) {
                 $isRequestingPrerenderedPage = true;
             }
@@ -179,35 +116,87 @@ class Prerender
             return false;
         }
 
-        if ($this->whitelist) {
-            if (!$this->isListed($requestUri, $this->whitelist)) {
-                return false;
-            }
+        if (!$this->isInAllowedList($requestUri)){
+            return false;
         }
 
-        if ($this->blacklist) {
-            $uris[] = $requestUri;
-            // we also check for a blacklisted referer
-            if ($referer) {
-                $uris[] = $referer;
-            }
-            if ($this->isListed($uris, $this->blacklist)) {
-                return false;
-            }
+        // we also check for a blocked referer
+        $uris = array_filter([$requestUri, ($referer ? $referer : '')]);
+        if ($this->isInBlockedList($uris)){
+            return false;
         }
 
         return true;
     }
 
     /**
-     * @param $needles
-     * @param $list
+     * @return string|null
+     */
+    private function getPrerenderToken() {
+        return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_TOKEN);
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getPrerenderUrl() {
+        return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_URL);
+    }
+
+    /**
+     * @return array
+     */
+    private function getCrawlerUserAgents() {
+        return $this->getList(
+            $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS)
+        );
+    }
+
+    /**
+     * @param $requestUri
+     * @return bool
+     */
+    private function isInAllowedList($requestUri) {
+        $allowedList = $this->getList(
+            $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST)
+        );
+
+        return empty($allowedList) || $this->isListed([$requestUri], $allowedList);
+    }
+
+    /**
+     * @param $requestUri
+     * @return bool
+     */
+    private function isInBlockedList($uris) {
+
+        $blockedList = $this->getList(
+            $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST)
+        );
+
+        return !empty($blockedList) && $this->isListed($uris, $blockedList);
+    }
+
+    /**
+     * @param string $list
+     * @return array
+     */
+    private function getList($list) {
+        return array_filter(
+            array_map(
+                'trim',
+                preg_split("/(\r\n|\n)/",$list ?? '')
+            )
+        );
+    }
+
+    /**
+     * @param array $needles
+     * @param array $list
      * @return bool
      */
     private function isListed($needles, $list)
     {
-        $needles = is_array($needles) ? $needles : [$needles];
-
         foreach ($list as $pattern) {
             foreach ($needles as $needle) {
                 if (fnmatch($pattern, $needle)) {
