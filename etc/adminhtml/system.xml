@@ -29,7 +29,8 @@
                 </field>
                 <field id="prerender_url" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="50" translate="label,comment" type="text">
                     <label>Prerender URL</label>
-                    <comment>https://service.prerender.io, or see https://github.com/prerender/prerender for testing locally</comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Baseurl</backend_model>
+                    <comment><![CDATA[Fully qualified URL that end with '/' (slash) e.g. https://service.prerender.io/]]></comment>
                 </field>
                 <field id="prerender_token" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="60" translate="label" type="text">
                     <label>Prerender.io Token</label>

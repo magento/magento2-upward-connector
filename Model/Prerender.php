@@ -10,6 +10,7 @@ namespace Magento\UpwardConnector\Model;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Escaper;
 use Psr\Log\LoggerInterface;
 
 class Prerender
@@ -32,19 +33,27 @@ class Prerender
     protected $logger;
 
     /**
+     * @var Escaper
+     */
+    protected $escaper;
+
+    /**
      * @param ZendClientFactory $httpClientFactory
      * @param ScopeConfigInterface $config
      * @param LoggerInterface $logger
+     * @param Escaper $escaper
      */
     public function __construct(
         ZendClientFactory $httpClientFactory,
         ScopeConfigInterface $config,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Escaper $escaper
     )
     {
         $this->httpClientFactory = $httpClientFactory;
         $this->config = $config;
         $this->logger = $logger;
+        $this->escaper = $escaper;
     }
 
     public function getPrerenderedPageResponse($request)
@@ -64,7 +73,8 @@ class Prerender
         if ($path === '/') {
             $path = '';
         }
-        $url = $this->getPrerenderUrl() . '/' . $protocol . '://' . $host . $path;
+
+        $url = $this->escaper->escapeUrl($this->getPrerenderUrl() . $protocol . '://' . $host . $path);
 
         $clientConfig = [
             'maxredirects' => 10,
