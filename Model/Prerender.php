@@ -10,6 +10,7 @@ namespace Magento\UpwardConnector\Model;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use Psr\Log\LoggerInterface;
 
 class Prerender
 {
@@ -26,16 +27,24 @@ class Prerender
     private $config;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @param ZendClientFactory $httpClientFactory
      * @param ScopeConfigInterface $config
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ZendClientFactory $httpClientFactory,
-        ScopeConfigInterface $config
+        ScopeConfigInterface $config,
+        LoggerInterface $logger
     )
     {
         $this->httpClientFactory = $httpClientFactory;
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     public function getPrerenderedPageResponse($request)
@@ -63,12 +72,19 @@ class Prerender
         ];
 
         $client = $this->httpClientFactory->create();
-        $client->setUri($url);
-        $client->setConfig($clientConfig);
-        $client->setHeaders($headers);
-        $content = $client->request(\Zend_Http_Client::GET)->getBody();
 
-        return $content;
+        try {
+            $client->setUri($url);
+            $client->setConfig($clientConfig);
+            $client->setHeaders($headers);
+            $request = $client->request(\Zend_Http_Client::GET);
+
+            return $request;
+        } catch (\Zend_Http_Client_Exception $e) {
+            $this->logger->critical($e);
+
+            return false;
+        }
     }
 
     public function shouldShowPrerenderedPage($request)

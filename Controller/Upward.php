@@ -65,9 +65,10 @@ class Upward implements FrontControllerInterface
         $this->response->setContent($content);
 
         if ($this->prerender->shouldShowPrerenderedPage($request)) {
+            /** @var \Zend\Http\Response $prerenderedResponse */
             $prerenderedResponse = $this->prerender->getPrerenderedPageResponse($request);
             if ($prerenderedResponse) {
-                $this->response->setContent($prerenderedResponse);
+                $this->response->setContent($prerenderedResponse->getBody());
             }
         }
 
