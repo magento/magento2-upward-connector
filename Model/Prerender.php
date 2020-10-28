@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model;
 
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\HTTP\ZendClientFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -21,6 +22,11 @@ class Prerender
     const XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS = 'web/upward/prerender_crawlers';
     const XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST = 'web/upward/prerender_allowed_list';
     const XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST = 'web/upward/prerender_blocked_list';
+
+    /**
+     * @var ZendClientFactory
+     */
+    private $httpClientFactory;
 
     /**
      * @var ScopeConfigInterface
@@ -56,7 +62,11 @@ class Prerender
         $this->escaper = $escaper;
     }
 
-    public function getPrerenderedPageResponse($request)
+    /**
+     * @param RequestInterface $request
+     * @return \Laminas\Http\Response|false
+     */
+    public function getPrerenderedPageResponse(RequestInterface $request)
     {
         $headers = [
             'User-Agent' => $request->getServer('HTTP_USER_AGENT'),
@@ -97,7 +107,11 @@ class Prerender
         }
     }
 
-    public function shouldShowPrerenderedPage($request)
+    /**
+     * @param RequestInterface $request
+     * @return bool
+     */
+    public function shouldShowPrerenderedPage(RequestInterface $request)
     {
         if (
             !$this->config->getValue(
@@ -158,46 +172,50 @@ class Prerender
     /**
      * @return string|null
      */
-    private function getPrerenderToken() {
+    private function getPrerenderToken()
+    {
         return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_TOKEN);
     }
 
     /**
      * @return string|null
      */
-    private function getPrerenderUrl() {
+    private function getPrerenderUrl()
+    {
         return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_URL);
     }
 
     /**
      * @return array
      */
-    private function getCrawlerUserAgents() {
+    private function getCrawlerUserAgents()
+    {
         return $this->getList(
-            $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS)
+            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS)
         );
     }
 
     /**
-     * @param $requestUri
+     * @param string $requestUri
      * @return bool
      */
-    private function isInAllowedList($requestUri) {
+    private function isInAllowedList(string $requestUri)
+    {
         $allowedList = $this->getList(
-            $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST)
+            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST)
         );
 
         return empty($allowedList) || $this->isListed([$requestUri], $allowedList);
     }
 
     /**
-     * @param $requestUri
+     * @param array $uris
      * @return bool
      */
-    private function isInBlockedList($uris) {
-
+    private function isInBlockedList(array $uris)
+    {
         $blockedList = $this->getList(
-            $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST)
+            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST)
         );
 
         return !empty($blockedList) && $this->isListed($uris, $blockedList);
@@ -207,7 +225,8 @@ class Prerender
      * @param string $list
      * @return array
      */
-    private function getList($list) {
+    private function getList(string $list)
+    {
         return array_filter(
             array_map(
                 'trim',
@@ -221,7 +240,7 @@ class Prerender
      * @param array $list
      * @return bool
      */
-    private function isListed($needles, $list)
+    private function isListed(array $needles, array $list)
     {
         foreach ($list as $pattern) {
             foreach ($needles as $needle) {
