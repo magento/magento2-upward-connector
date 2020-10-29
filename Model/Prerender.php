@@ -8,11 +8,12 @@ declare(strict_types=1);
 namespace Magento\UpwardConnector\Model;
 
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\HTTP\ZendClientFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Escaper;
 use Psr\Log\LoggerInterface;
+
+use Laminas\Http\Client;
 
 class Prerender
 {
@@ -22,11 +23,6 @@ class Prerender
     const XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS = 'web/upward/prerender_crawlers';
     const XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST = 'web/upward/prerender_allowed_list';
     const XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST = 'web/upward/prerender_blocked_list';
-
-    /**
-     * @var ZendClientFactory
-     */
-    private $httpClientFactory;
 
     /**
      * @var ScopeConfigInterface
@@ -44,18 +40,15 @@ class Prerender
     protected $escaper;
 
     /**
-     * @param ZendClientFactory $httpClientFactory
      * @param ScopeConfigInterface $config
      * @param LoggerInterface $logger
      * @param Escaper $escaper
      */
     public function __construct(
-        ZendClientFactory $httpClientFactory,
         ScopeConfigInterface $config,
         LoggerInterface $logger,
         Escaper $escaper
     ) {
-        $this->httpClientFactory = $httpClientFactory;
         $this->config = $config;
         $this->logger = $logger;
         $this->escaper = $escaper;
@@ -87,21 +80,19 @@ class Prerender
 
         $url = $this->escaper->escapeUrl($this->getPrerenderUrl() . $protocol . '://' . $host . $path);
 
-        $clientConfig = [
+        $config = [
             'maxredirects' => 10,
             'timeout' => 50,
+            'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
+            'curloptions' => [CURLOPT_FOLLOWLOCATION => true]
         ];
 
-        $client = $this->httpClientFactory->create();
-
         try {
-            $client->setUri($url);
-            $client->setConfig($clientConfig);
+            $client = new Client($url, $config);
             $client->setHeaders($headers);
-            $request = $client->request(\Zend_Http_Client::GET);
 
-            return $request;
-        } catch (\Zend_Http_Client_Exception $e) {
+            return $client->send();
+        } catch (\Laminas\Http\Client\Exception $e) {
             $this->logger->critical($e);
 
             return false;
