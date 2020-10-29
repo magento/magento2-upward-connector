@@ -54,8 +54,7 @@ class Prerender
         ScopeConfigInterface $config,
         LoggerInterface $logger,
         Escaper $escaper
-    )
-    {
+    ) {
         $this->httpClientFactory = $httpClientFactory;
         $this->config = $config;
         $this->logger = $logger;
@@ -63,6 +62,8 @@ class Prerender
     }
 
     /**
+     * Send the request to prerender services to get prerendered html content.
+     *
      * @param RequestInterface $request
      * @return \Laminas\Http\Response|false
      */
@@ -108,16 +109,15 @@ class Prerender
     }
 
     /**
+     * Check if resources should be prerendered.
+     *
      * @param RequestInterface $request
      * @return bool
      */
     public function shouldShowPrerenderedPage(RequestInterface $request)
     {
-        if (
-            !$this->config->getValue(
-                static::XML_PATH_WEB_UPWARD_PRERENDER,
-                ScopeInterface::SCOPE_STORE) ||
-            !$this->getPrerenderUrl()
+        if (!$this->getPrerenderUrl() ||
+            !$this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER, scopeInterface::SCOPE_STORE)
         ) {
             return false;
         }
@@ -156,13 +156,13 @@ class Prerender
             return false;
         }
 
-        if (!$this->isInAllowedList($requestUri)){
+        if (!$this->isInAllowedList($requestUri)) {
             return false;
         }
 
         // we also check for a blocked referer
         $uris = array_filter([$requestUri, ($referer ? $referer : '')]);
-        if ($this->isInBlockedList($uris)){
+        if ($this->isInBlockedList($uris)) {
             return false;
         }
 
@@ -170,6 +170,8 @@ class Prerender
     }
 
     /**
+     * Get prerender token from configuration.
+     *
      * @return string|null
      */
     private function getPrerenderToken()
@@ -178,6 +180,8 @@ class Prerender
     }
 
     /**
+     * Get prerender url from configuration.
+     *
      * @return string|null
      */
     private function getPrerenderUrl()
@@ -186,6 +190,8 @@ class Prerender
     }
 
     /**
+     * Get Crawler User Agents from configuration.
+     *
      * @return array
      */
     private function getCrawlerUserAgents()
@@ -196,6 +202,8 @@ class Prerender
     }
 
     /**
+     * Checks if uri is in allowed list.
+     *
      * @param string $requestUri
      * @return bool
      */
@@ -209,6 +217,8 @@ class Prerender
     }
 
     /**
+     * Checks if uri is in blocked list.
+     *
      * @param array $uris
      * @return bool
      */
@@ -222,6 +232,8 @@ class Prerender
     }
 
     /**
+     * Transforms string from configuration to the array.
+     *
      * @param string $list
      * @return array
      */
@@ -230,12 +242,14 @@ class Prerender
         return array_filter(
             array_map(
                 'trim',
-                preg_split("/(\r\n|\n)/",$list ?? '')
+                preg_split("/(\r\n|\n)/", $list ?? '')
             )
         );
     }
 
     /**
+     * Checks if provided uri is listed in the list from configuration.
+     *
      * @param array $needles
      * @param array $list
      * @return bool
