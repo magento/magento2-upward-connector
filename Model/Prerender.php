@@ -12,8 +12,9 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Escaper;
 use Psr\Log\LoggerInterface;
-
-use Laminas\Http\Client;
+use Laminas\Http\Exception;
+use Laminas\Http\ClientFactory;
+use Laminas\Http\Client\Adapter\Curl;
 
 class Prerender
 {
@@ -30,6 +31,11 @@ class Prerender
     private $config;
 
     /**
+     * @var ClientFactory
+     */
+    private $clientFactory;
+
+    /**
      * @var LoggerInterface
      */
     protected $logger;
@@ -41,15 +47,18 @@ class Prerender
 
     /**
      * @param ScopeConfigInterface $config
+     * @param ClientFactory $clientFactory
      * @param LoggerInterface $logger
      * @param Escaper $escaper
      */
     public function __construct(
         ScopeConfigInterface $config,
+        ClientFactory $clientFactory,
         LoggerInterface $logger,
         Escaper $escaper
     ) {
         $this->config = $config;
+        $this->clientFactory = $clientFactory;
         $this->logger = $logger;
         $this->escaper = $escaper;
     }
@@ -81,18 +90,22 @@ class Prerender
         $url = $this->escaper->escapeUrl($this->getPrerenderUrl() . $protocol . '://' . $host . $path);
 
         $config = [
-            'maxredirects' => 10,
-            'timeout' => 50,
-            'adapter' => \Laminas\Http\Client\Adapter\Curl::class,
-            'curloptions' => [CURLOPT_FOLLOWLOCATION => true]
+            'adapter' => Curl::class,
+            'curloptions' => [
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 50,
+                CURLOPT_FOLLOWLOCATION => true
+            ]
         ];
 
         try {
-            $client = new Client($url, $config);
+            $client = $this->clientFactory->create();
+            $client->setUri($url);
+            $client->setOptions($config);
             $client->setHeaders($headers);
 
             return $client->send();
-        } catch (\Laminas\Http\Client\Exception $e) {
+        } catch (Exception\RuntimeException | Exception\InvalidArgumentException $e) {
             $this->logger->critical($e);
 
             return false;

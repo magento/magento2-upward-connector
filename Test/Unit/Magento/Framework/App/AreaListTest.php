@@ -8,17 +8,18 @@ declare(strict_types=1);
 namespace Magento\UpwardConnector\Test\Unit\Magento\Framework\App;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Magento\UpwardConnector\Plugin\Magento\Framework\App\AreaList as AreaListPlugin;
 
 class AreaListTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeConfigInterface|MockObject
      */
     private $scopeConfig;
 
     /**
-     * \Magento\Framework\App\AreaList|\PHPUnit_Framework_MockObject_MockObject
+     * \Magento\Framework\App\AreaList|MockObject
      */
     private $areaListMock;
 
@@ -27,7 +28,7 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
      */
     private $areaListPlugin;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->areaListMock = $this->createMock(\Magento\Framework\App\AreaList::class);
