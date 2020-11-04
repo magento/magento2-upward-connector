@@ -36,5 +36,11 @@ privacy-policy-cookie-restriction-mode
 
 With this example, when a visitor navigates to either `<Magento store URL>/contact` or `<Magento store URL>/privacy-policy-cookie-restriction-mode`, they will land on a page rendered by Magento instead of the storefront application.
 
+## Service Worker Note
+
+Avoid sharing the same hostname between your PWA Studio storefront and the Magento 2 admin backend.
+This causes the storefront Service Worker to intercept backend requests when you have both the storefront and admin tabs open at the same time on your browser.
+If you cannot avoid sharing the hostname, access one service at a time or use a private browsing session per service.
+
 [upward-php]: https://github.com/magento/upward-php
 [magento cloud deployment]: http://pwastudio.io/tutorials/cloud-deploy/
