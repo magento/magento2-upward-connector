@@ -38,12 +38,12 @@ class Prerender
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @var Escaper
      */
-    protected $escaper;
+    private $escaper;
 
     /**
      * @param ScopeConfigInterface $config
@@ -125,38 +125,14 @@ class Prerender
         ) {
             return false;
         }
-
-        $userAgent = strtolower($request->getServer('HTTP_USER_AGENT'));
-        $bufferAgent = $request->getServer('X-BUFFERBOT');
-
         $requestUri = $request->getRequestUri();
         $referer = $request->getHeader('referer');
 
-        $isRequestingPrerenderedPage = false;
-
-        if (!$userAgent) {
-            return false;
-        }
         if (!$request->isGet()) {
             return false;
         }
 
-        // prerender if _escaped_fragment_ is in the query string
-        if ($request->getQuery('_escaped_fragment_')) {
-            $isRequestingPrerenderedPage = true;
-        }
-
-        foreach ($this->getCrawlerUserAgents() as $crawlerUserAgent) {
-            if (strpos(strtolower($userAgent), strtolower($crawlerUserAgent)) !== false) {
-                $isRequestingPrerenderedPage = true;
-            }
-        }
-
-        if ($bufferAgent) {
-            $isRequestingPrerenderedPage = true;
-        }
-
-        if (!$isRequestingPrerenderedPage) {
+        if (!$this->isCrawlerUserAgent($request)) {
             return false;
         }
 
@@ -194,15 +170,36 @@ class Prerender
     }
 
     /**
-     * Get Crawler User Agents from configuration.
+     * Check if user agent is crawler bot.
      *
-     * @return array
+     * @param RequestInterface $request
+     * @return bool
      */
-    private function getCrawlerUserAgents()
+    private function isCrawlerUserAgent(RequestInterface $request)
     {
-        return $this->getList(
+        $userAgent = strtolower($request->getServer('HTTP_USER_AGENT'));
+        if (!$userAgent) {
+            return false;
+        }
+
+        $bufferAgent = $request->getServer('X-BUFFERBOT');
+
+        // prerender if _escaped_fragment_ is in the query string
+        if ($bufferAgent || $request->getQuery('_escaped_fragment_')) {
+            return true;
+        }
+
+        $crawlerUserAgents = $this->getList(
             (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS)
         );
+
+        foreach ($crawlerUserAgents as $crawlerUserAgent) {
+            if (strpos(strtolower($userAgent), strtolower($crawlerUserAgent)) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

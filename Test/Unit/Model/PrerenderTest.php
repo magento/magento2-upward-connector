@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Laminas\Http\Client;
 use Laminas\Http\Response;
+use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 
 class PrerenderTest extends TestCase
 {
@@ -30,11 +31,6 @@ class PrerenderTest extends TestCase
      * @var ScopeConfigInterface|MockObject
      */
     private $config;
-
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private $logger;
 
     /**
      * @var RequestInterface|MockObject
@@ -56,12 +52,12 @@ class PrerenderTest extends TestCase
      */
     private $prerenderer;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
-        $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        $objectManagerHelper = new ObjectManager($this);
         //$this->clientFactoryMock = $this->createMock(ClientFactory::class);
         $this->config = $this->getMockForAbstractClass(ScopeConfigInterface::class);
-        $this->logger = $this->getMockForAbstractClass(LoggerInterface::class);
+        $logger = $this->getMockForAbstractClass(LoggerInterface::class);
 
         $this->clientFactoryMock = $this->getMockBuilder(ClientFactory::class)
             ->disableOriginalConstructor()
@@ -97,7 +93,7 @@ class PrerenderTest extends TestCase
         $this->prerenderer = $objectManagerHelper->getObject(Prerender::class, [
             'clientFactory' => $this->clientFactoryMock,
             'config' => $this->config,
-            'logger' => $this->logger,
+            'logger' => $logger,
             'escaper' => $this->escaper
         ]);
     }
@@ -217,6 +213,7 @@ class PrerenderTest extends TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function shouldShowPrerenderedDataProvider(): array
@@ -231,7 +228,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.html',
                     'referer' => '',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => null,
                     'blockedList' => "*.js\n *.css"
@@ -246,7 +243,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.html',
                     'referer' => '',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => null,
                     'blockedList' => "*.js\n"
@@ -261,7 +258,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.html',
                     'referer' => '',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => null,
                     'blockedList' => "*.js\n"
@@ -276,7 +273,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.js',
                     'referer' => '',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => null,
                     'blockedList' => "*.js\n"
@@ -291,7 +288,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.html',
                     'referer' => 'https://blocked.referer',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => null,
                     'blockedList' => "*.js\n *://blocked.referer"
@@ -306,7 +303,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.js',
                     'referer' => '',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => "*.js",
                     'blockedList' => "*.css"
@@ -321,14 +318,14 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.js',
                     'referer' => '',
-                    'userAgent' => 'googlebot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => "*.html",
                     'blockedList' => ""
                 ],
                 false
             ],
-            'Should not prerender when not crawler' => [
+            'Should not prerender when not listed crawler' => [
                 [
                     'prerenderEnabled' => true,
                     'prerenderUrl' => 'https://example.com/',
@@ -336,7 +333,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.html',
                     'referer' => '',
-                    'userAgent' => 'notbot',
+                    'userAgent' => 'Mozilla/5.0 (compatible; otherbot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => "*.html",
                     'blockedList' => "*.css"
@@ -351,7 +348,7 @@ class PrerenderTest extends TestCase
                     'escapedFragment' => null,
                     'requestUri' => 'test.html',
                     'referer' => '',
-                    'userAgent' => 'unknown',
+                    'userAgent' => 'Mozilla/5.0 (compatible; otherbot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => "*.html",
                     'blockedList' => "*.css"
@@ -363,10 +360,10 @@ class PrerenderTest extends TestCase
                     'prerenderEnabled' => true,
                     'prerenderUrl' => 'https://example.com/',
                     'bufferAgent' => null,
-                    'escapedFragment' => '1',
+                    'escapedFragment' => '42',
                     'requestUri' => 'test.html',
                     'referer' => '',
-                    'userAgent' => 'unknown',
+                    'userAgent' => 'Mozilla/5.0 (compatible; otherbot/2.1; +http://www.google.com/bot.html)',
                     'crawlerUserAgents' => "testbot\n googlebot\n",
                     'allowedList' => "*.html",
                     'blockedList' => "*.css"
