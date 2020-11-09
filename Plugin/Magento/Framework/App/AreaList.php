@@ -31,11 +31,14 @@ class AreaList
     }
 
     /**
+     * Add pwa area code by front name
+     *
      * @param \Magento\Framework\App\AreaList $subject
      * @param string|null $result
      * @param string $frontName
      *
      * @return string|null
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterGetCodeByFrontName(
         \Magento\Framework\App\AreaList $subject,

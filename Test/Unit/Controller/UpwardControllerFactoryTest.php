@@ -11,17 +11,18 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
+use PHPUnit\Framework\MockObject\MockObject;
 use Magento\UpwardConnector\Controller\UpwardControllerFactory;
 
 class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeConfigInterface|MockObject
      */
     private $config;
 
     /**
-     * @var ObjectManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectManagerInterface|MockObject
      */
     private $objectManager;
 
@@ -30,7 +31,7 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private $upwardControllerFactory;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
         $this->objectManager = $this->createMock(ObjectManagerInterface::class);

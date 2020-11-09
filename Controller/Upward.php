@@ -11,7 +11,8 @@ use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\HTTP\PhpEnvironment\Response;
-use Zend\Http\Response\Stream;
+use Laminas\Http\Response\Stream;
+use Magento\UpwardConnector\Model\Prerender;
 
 class Upward implements FrontControllerInterface
 {
@@ -26,13 +27,24 @@ class Upward implements FrontControllerInterface
     private $upwardFactory;
 
     /**
+     * @var Prerender
+     */
+    private $prerender;
+
+    /**
+     * Upward constructor.
      * @param Response $response
      * @param UpwardControllerFactory $upwardFactory
+     * @param Prerender $prerender
      */
-    public function __construct(Response $response, UpwardControllerFactory $upwardFactory)
-    {
+    public function __construct(
+        Response $response,
+        UpwardControllerFactory $upwardFactory,
+        Prerender $prerender
+    ) {
         $this->response = $response;
         $this->upwardFactory = $upwardFactory;
+        $this->prerender = $prerender;
     }
 
     /**
@@ -43,8 +55,14 @@ class Upward implements FrontControllerInterface
      */
     public function dispatch(RequestInterface $request)
     {
-        /** @var \Zend\Http\Response $upwardResponse */
-        $upwardResponse = $this->upwardFactory->create($request)();
+        $prerenderedResponse = null;
+        if ($this->prerender->shouldShowPrerenderedPage($request)) {
+            /** @var \Laminas\Http\Response $prerenderedResponse */
+            $prerenderedResponse = $this->prerender->getPrerenderedPageResponse($request);
+        }
+
+        /** @var \Laminas\Http\Response $upwardResponse */
+        $upwardResponse = $prerenderedResponse ? $prerenderedResponse : $this->upwardFactory->create($request)();
         $content = $upwardResponse instanceof Stream ? $upwardResponse->getBody() : $upwardResponse->getContent();
 
         $this->response->setHeaders($upwardResponse->getHeaders());

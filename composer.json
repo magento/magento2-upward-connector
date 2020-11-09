@@ -8,6 +8,7 @@
         "php": "~7.3.0||~7.4.0",
         "magento/framework": "*",
         "magento/upward": "*",
+        "magento/module-store": "*",
         "yireo/magento2-disable-service-worker-in-admin": "^0.0.2"
     },
     "type": "magento2-module",
