@@ -9,6 +9,7 @@
     <default>
         <web>
             <upward>
+                <front_names_to_skip>shipping</front_names_to_skip>
                 <prerender_enabled>0</prerender_enabled>
                 <prerender_crawlers>
 googlebot

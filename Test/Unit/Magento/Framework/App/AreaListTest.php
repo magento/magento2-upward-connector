@@ -70,8 +70,8 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
         return [
             'Adminhtml area passes through' => ['adminhtml', '', 'adminhtml'],
             'Frontend area w/o frontname goes to UPWARD' => ['frontend', '', 'pwa'],
-            'Frontend area w/o frontname in whitelist goes to UPWARD' => ['frontend', 'baz', 'pwa'],
-            'Frontend area with frontname in whitelist passes through' => ['frontend', 'foo', 'frontend']
+            'Frontend area w/o frontname in allow list goes to UPWARD' => ['frontend', 'baz', 'pwa'],
+            'Frontend area with frontname in allow list passes through' => ['frontend', 'foo', 'frontend']
         ];
     }
 }

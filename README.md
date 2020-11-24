@@ -23,7 +23,7 @@ _Use the absolute path on the server for the value of this configuration._
 
 Example: `/app/node_modules/@magento/venia-concept/dist/upward.yml`
 
-### Front Name Whitelist
+### Front Name Allowlist
 
 This configuration allows you to specify a line-separated list of routes to forward to the default Magento theme.
 
