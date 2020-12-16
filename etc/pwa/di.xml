@@ -8,4 +8,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Framework\App\FrontControllerInterface" type="Magento\UpwardConnector\Controller\Upward" />
+    <type name="Magento\Framework\App\FrontControllerInterface">
+        <plugin name="di_compile_fix" type="Magento\UpwardConnector\Plugin\Magento\Framework\App\DICompileFix" />
+    </type>
 </config>
