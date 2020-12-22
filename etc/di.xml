@@ -17,4 +17,11 @@
         </arguments>
         <plugin name="upward_connector_app_areaList" sortOrder="10" type="Magento\UpwardConnector\Plugin\Magento\Framework\App\AreaList" />
     </type>
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="environment" xsi:type="array">
+                <item name="web/upward/path" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

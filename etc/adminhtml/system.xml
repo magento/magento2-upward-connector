@@ -12,12 +12,7 @@
             <group id="upward" translate="label" type="text" sortOrder="300"
                 showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>UPWARD PWA Configuration</label>
-                <field id="config_path" type="text" translate="label,comment"
-                    sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>UPWARD Config File</label>
-                    <config_path>web/upward/path</config_path>
-                    <comment>Server path to YAML configuration file for UPWARD</comment>
-                </field>
+                <field id="path" type="text" showInDefault="0" showInWebsite="0" showInStore="0" />
                 <field id="front_names_to_skip" canRestore="1" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label,comment" type="textarea">
                     <label>Front Name Allowlist</label>
                     <comment>Line break separated list of URL's that will load the default Magento frontend.</comment>

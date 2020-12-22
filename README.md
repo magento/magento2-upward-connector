@@ -11,20 +11,23 @@ The Magento 2 UPWARD connector module is part of the [Magento Cloud deployment][
 
 ## Configuration
 
-The Magento 2 UPWARD connector is configured in the admin area under:
+The Magento 2 UPWARD connector has additional settings that can be configured in the admin area under:
 
 **Stores > Configuration > General > Web > UPWARD PWA Configuration**.
 
 ### General configuration
 
 These are the configurations for the UPWARD process itself.
+
 #### UPWARD Config File
 
 This configuration is the location of the UPWARD configuration file for the UPWARD-PHP server.
+It is recommended you follow [system-specific best practices][] and set this value with an environment variable or the `magento config:set` CLI command.
 
-_Use the absolute path on the server for the value of this configuration._
+_You may use a path relative to your web root or an absolute path for the value of this configuration._
 
-Example: `/app/node_modules/@magento/venia-concept/dist/upward.yml`
+Relative: `fastcgi_param CONFIG__DEFAULT__WEB__UPWARD__PATH pwa/upward.yml`
+Absolute: `magento config:set -e web/upward/path /app/node_modules/@magento/venia-concept/dist/upward.yml`
 
 #### Front Name Allowlist
 
@@ -61,7 +64,7 @@ If a page is not configured for prerendering, the request continues using the no
 To see how a crawler sees a prerendered page, set your browser's User Agent to `Googlebot` and visit your URL.
 You can also run this on the command line and change the sample URL to your storefront's URL:
 
-``` sh
+```sh
 curl -A Googlebot https://www.example.com/ > page.html
 ```
 
@@ -74,9 +77,11 @@ For prerendering it is possible to force prerender to wait for a predefined time
 
 Add the following to the runtime script:
 
-``` js
+```js
 window.prerenderReady = false;
-setTimeout(function () { window.prerenderReady = true }, 1000 * 15)
+setTimeout(function () {
+  window.prerenderReady = true;
+}, 1000 * 15);
 ```
 
 For more information, see https://docs.prerender.io/test-it/.
@@ -90,3 +95,4 @@ If you cannot avoid sharing the hostname, access one service at a time or use a 
 [upward-php]: https://github.com/magento/upward-php
 [magento cloud deployment]: http://pwastudio.io/tutorials/cloud-deploy/
 [prerender.io]: https://docs.prerender.io/
+[system-specific best practices]: https://devdocs.magento.com/guides/v2.4/config-guide/prod/config-reference-var-name.html
