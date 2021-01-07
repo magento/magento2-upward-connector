@@ -26,21 +26,36 @@
                     <label>Prerender URL</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Baseurl</backend_model>
                     <comment><![CDATA[Fully qualified URL that end with '/' (slash) e.g. https://service.prerender.io/]]></comment>
+                    <depends>
+                        <field id="web/upward/prerender_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="prerender_token" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="60" translate="label" type="text">
                     <label>Prerender.io Token</label>
+                    <depends>
+                        <field id="web/upward/prerender_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="prerender_crawlers" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="70" translate="label,comment" type="textarea">
                     <label>Crawler User Agents</label>
                     <comment>Line break separated list of Crawler User Agents.</comment>
+                    <depends>
+                        <field id="web/upward/prerender_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="prerender_blocked_list" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="80" translate="label,comment" type="textarea">
                     <label>Blocked List</label>
                     <comment>Line break separated list of resources that should not be prerendered. i.e. *.css</comment>
+                    <depends>
+                        <field id="web/upward/prerender_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="prerender_allowed_list" showInDefault="1" showInStore="0" showInWebsite="0" sortOrder="90" translate="label,comment" type="textarea">
                     <label>Allowed List</label>
                     <comment>Line break separated list of resources that should be prerendered. All resources will be sent for prerender if the list is empty.</comment>
+                    <depends>
+                        <field id="web/upward/prerender_enabled">1</field>
+                    </depends>
                 </field>
             </group>
         </section>
