@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <web>
+            <upward>
+                <front_names_to_skip>shipping</front_names_to_skip>
+                <prerender_enabled>0</prerender_enabled>
+                <prerender_crawlers>
+googlebot
+yahoo
+bingbot
+yandex
+baiduspider
+facebookexternalhit
+twitterbot
+rogerbot
+linkedinbot
+embedly
+quora link preview
+showyoubot
+outbrain
+pinterest
+developers.google.com/+/web/snippet
+slackbot</prerender_crawlers>
+                <prerender_allowed_list></prerender_allowed_list>
+                <prerender_blocked_list>
+*.js
+*.css
+*.xml
+*.less
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.gif
+*.pdf
+*.doc
+*.txt
+*.ico
+*.rss
+*.zip
+*.mp3
+*.rar
+*.exe
+*.wmv
+*.doc
+*.avi
+*.ppt
+*.mpg
+*.mpeg
+*.tif
+*.wav
+*.mov
+*.psd
+*.ai
+*.xls
+*.mp4
+*.m4a
+*.swf
+*.dat
+*.dmg
+*.iso
+*.flv
+*.m4v
+*.torrent
+*.eot
+*.ttf
+*.otf
+*.woff
+*.woff2
+*.json</prerender_blocked_list>
+            </upward>
+        </web>
+    </default>
+</config>

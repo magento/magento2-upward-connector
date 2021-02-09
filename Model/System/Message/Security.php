@@ -6,12 +6,10 @@
 
 namespace Magento\UpwardConnector\Model\System\Message;
 
-use Magento\Store\Model\Store;
-
 class Security implements \Magento\Framework\Notification\MessageInterface
 {
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getIdentity()
     {
@@ -19,7 +17,7 @@ class Security implements \Magento\Framework\Notification\MessageInterface
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function isDisplayed()
     {
@@ -27,6 +25,8 @@ class Security implements \Magento\Framework\Notification\MessageInterface
     }
 
     /**
+     * Retrieve message text
+     *
      * @return \Magento\Framework\Phrase
      */
     public function getText()
@@ -35,7 +35,7 @@ class Security implements \Magento\Framework\Notification\MessageInterface
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getSeverity()
     {
