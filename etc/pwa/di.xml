@@ -11,4 +11,11 @@
     <type name="Magento\Framework\App\FrontControllerInterface">
         <plugin name="di_compile_fix" type="Magento\UpwardConnector\Plugin\Magento\Framework\App\DICompileFix" />
     </type>
+    <type name="Magento\UpwardConnector\Model\ComputedPool">
+        <arguments>
+            <argument name="items" xsi:type="array">
+                <item name="pageType" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageType</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
