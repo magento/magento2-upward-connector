@@ -14,7 +14,8 @@
     <type name="Magento\UpwardConnector\Model\ComputedPool">
         <arguments>
             <argument name="items" xsi:type="array">
-                <item name="pageType" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageType</item>
+                <item name="pageType" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageInfo</item>
+                <item name="webpackChunks" xsi:type="object">Magento\UpwardConnector\Model\Computed\WebpackChunks</item>
             </argument>
         </arguments>
     </type>

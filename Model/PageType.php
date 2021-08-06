@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Magento\UpwardConnector\Model\Computed;
+namespace Magento\UpwardConnector\Model;
 
-use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
 use Magento\UrlRewriteGraphQl\Model\Resolver\UrlRewrite\CustomUrlLocatorInterface;
+use Magento\Upward\Context;
 
-class PageType implements ComputedInterface
+class PageType
 {
     /** @var \Magento\Store\Model\StoreManagerInterface */
     private $storeManager;
@@ -28,6 +28,12 @@ class PageType implements ComputedInterface
     /** @var int */
     private $redirectType;
 
+    /** @var \Magento\Upward\Context */
+    private $context;
+
+    /** @var array|null */
+    private $pageType;
+
     public function __construct(
         StoreManagerInterface $storeManager,
         UrlFinderInterface $urlFinder,
@@ -40,14 +46,48 @@ class PageType implements ComputedInterface
         $this->json = $json;
     }
 
-    public function resolve($context)
+    public function getInfo(): ?array
     {
-        // TODO resolve current store (reference graphql context)
+        if ($this->pageType === null) {
+            $this->pageType = $this->resolvePageInfo();
+        }
+
+        return $this->pageType;
+    }
+
+    public function getJson(): string
+    {
+        $pageType = $this->getInfo();
+
+        return $pageType ? $this->json->serialize($pageType) : '';
+    }
+
+    public function getPageType(): ?string
+    {
+        $pageInfo = $this->getInfo();
+
+        return $pageInfo['type'] ?? null;
+    }
+
+    public function setContext(Context $context): self
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    public function getContext(): ?Context
+    {
+        return $this->context;
+    }
+
+    public function resolvePageInfo(): ?array
+    {
         $storeId = (int) $this->storeManager->getStore()->getId();
-        $request = $context->get('request')->toArray();
+        $request = $this->getContext()->get('request')->toArray();
         $urlParts = $request['url'];
         $url = $urlParts['pathname'];
-        $result = [];
+        $result = null;
 
         if (substr($url, 0, 1) === '/' && $url !== '/') {
             $url = ltrim($url, '/');
@@ -71,16 +111,15 @@ class PageType implements ComputedInterface
             }
 
             if (empty($resultArray['id'])) {
-                // TODO throw different error type
-                throw new GraphQlNoSuchEntityException(
+                throw new \RuntimeException(
                     __('No such entity found with matching URL key: %url', ['url' => $url])
                 );
             }
 
-            $result = $resultArray ?: [];
+            $result = $resultArray ?: null;
         }
 
-        return $this->json->serialize($result);
+        return $result;
     }
 
 
