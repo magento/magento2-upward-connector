@@ -19,4 +19,13 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite">
+        <arguments>
+            <argument name="dataProviders" xsi:type="array">
+                <item name="category" xsi:type="object">Magento\UpwardConnector\Model\DataProvider\UrlRewrite\CatalogDataProvider</item>
+                <item name="product" xsi:type="object">Magento\CatalogUrlRewriteGraphQl\Model\DataProvider\UrlRewrite\ProductDataProvider</item>
+                <item name="cms_page" xsi:type="object">Magento\CmsUrlRewriteGraphQl\Model\DataProvider\UrlRewrite\Page</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

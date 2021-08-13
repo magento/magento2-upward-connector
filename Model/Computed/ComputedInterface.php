@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model\Computed;
 
+use Magento\Upward\Definition;
 use Magento\Upward\DefinitionIterator;
 
 interface ComputedInterface
@@ -12,8 +13,9 @@ interface ComputedInterface
      * Resolve value to use in upward config
      *
      * @param \Magento\Upward\DefinitionIterator $iterator
+     * @param \Magento\Upward\Definition $definition
      *
      * @return mixed
      */
-    public function resolve(DefinitionIterator $iterator);
+    public function resolve(DefinitionIterator $iterator, Definition $definition);
 }

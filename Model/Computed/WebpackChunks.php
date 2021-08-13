@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model\Computed;
 
-use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem\Driver\File;
+use Magento\Upward\Definition;
 use Magento\Upward\DefinitionIterator;
 use Magento\UpwardConnector\Model\PageType;
 
@@ -16,23 +16,18 @@ class WebpackChunks implements ComputedInterface
     /** @var \Magento\UpwardConnector\Model\PageType */
     private $pageTypeResolver;
 
-    /** @var \Magento\Framework\Filesystem\DirectoryList */
-    private $directoryList;
-
     /** @var \Magento\Framework\Filesystem\Driver\File */
     private $driverFile;
 
     public function __construct(
         PageType $pageTypeResolver,
-        DirectoryList $directoryList,
         File $driverFile
     ) {
         $this->pageTypeResolver = $pageTypeResolver;
-        $this->directoryList = $directoryList;
         $this->driverFile = $driverFile;
     }
 
-    public function resolve(DefinitionIterator $iterator)
+    public function resolve(DefinitionIterator $iterator, Definition $definition)
     {
         $pageType = $this->pageTypeResolver->setContext($iterator->getContext())->getPageType();
 

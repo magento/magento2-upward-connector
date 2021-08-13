@@ -22,9 +22,6 @@ class PageType
     /** @var \Magento\UrlRewriteGraphQl\Model\Resolver\UrlRewrite\CustomUrlLocatorInterface */
     private $customUrlLocator;
 
-    /** @var \Magento\Framework\Serialize\Serializer\Json */
-    private $json;
-
     /** @var int */
     private $redirectType;
 
@@ -37,13 +34,11 @@ class PageType
     public function __construct(
         StoreManagerInterface $storeManager,
         UrlFinderInterface $urlFinder,
-        CustomUrlLocatorInterface $customUrlLocator,
-        Json $json
+        CustomUrlLocatorInterface $customUrlLocator
     ) {
         $this->storeManager = $storeManager;
         $this->urlFinder = $urlFinder;
         $this->customUrlLocator = $customUrlLocator;
-        $this->json = $json;
     }
 
     public function getInfo(): ?array
@@ -53,13 +48,6 @@ class PageType
         }
 
         return $this->pageType;
-    }
-
-    public function getJson(): string
-    {
-        $pageType = $this->getInfo();
-
-        return $pageType ? $this->json->serialize($pageType) : '';
     }
 
     public function getPageType(): ?string
@@ -92,6 +80,8 @@ class PageType
         if (substr($url, 0, 1) === '/' && $url !== '/') {
             $url = ltrim($url, '/');
         }
+        $url = ltrim($url, $this->storeManager->getStore()->getCode() . '/');
+
         $this->redirectType = 0;
         $customUrl = $this->customUrlLocator->locateUrl($url);
         $url = $customUrl ?: $url;
