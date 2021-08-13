@@ -80,7 +80,7 @@ class PageType
         if (substr($url, 0, 1) === '/' && $url !== '/') {
             $url = ltrim($url, '/');
         }
-        $url = ltrim($url, $this->storeManager->getStore()->getCode() . '/');
+        $url = preg_replace('/^' . $this->storeManager->getStore()->getCode() . '\//', '', $url);
 
         $this->redirectType = 0;
         $customUrl = $this->customUrlLocator->locateUrl($url);
