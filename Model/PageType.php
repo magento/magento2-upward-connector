@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -81,15 +85,23 @@ class PageType
         return $this->context;
     }
 
+    /**
+     * @return array<string, string>|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function resolvePageInfo(): ?array
     {
+        if (!$this->getContext()) {
+            throw new \RuntimeException('UPWARD Context not set');
+        }
+
         $storeId = (int) $this->storeManager->getStore()->getId();
         $request = $this->getContext()->get('request')->toArray();
         $urlParts = $request['url'];
         $url = $urlParts['pathname'];
         $result = null;
 
-        if (substr($url, 0, 1) === '/' && $url !== '/') {
+        if ($url !== '/' && strpos($url, '/') === 0) {
             $url = ltrim($url, '/');
         }
         $this->redirectType = 0;
@@ -136,7 +148,7 @@ class PageType
             $finalCustomUrlRewrite = clone $finalUrlRewrite;
             $finalUrlRewrite = $this->findFinalUrl($finalCustomUrlRewrite->getTargetPath(), $storeId, true);
             $relativeUrl =
-                $finalCustomUrlRewrite->getRedirectType() == 0
+                (int) $finalCustomUrlRewrite->getRedirectType() === 0
                     ? $finalCustomUrlRewrite->getRequestPath() : $finalUrlRewrite->getRequestPath();
             return [
                 'id' => $finalUrlRewrite->getEntityId(),

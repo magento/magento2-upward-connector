@@ -1,11 +1,18 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
-namespace Magento\UpwardConnector\Model\Computed;
+namespace Magento\UpwardConnector\Api;
 
 use Magento\Upward\DefinitionIterator;
 
+/**
+ * Resolves a computed value for UPWARD
+ */
 interface ComputedInterface
 {
     /**
@@ -13,7 +20,7 @@ interface ComputedInterface
      *
      * @param \Magento\Upward\DefinitionIterator $iterator
      *
-     * @return mixed
+     * @return array|int|string|null
      */
     public function resolve(DefinitionIterator $iterator);
 }
