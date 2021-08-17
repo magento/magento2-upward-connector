@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -8,6 +12,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Upward\Definition;
 use Magento\Upward\DefinitionIterator;
+use Magento\UpwardConnector\Api\ComputedInterface;
 use Magento\UpwardConnector\Model\PageType;
 use Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite;
 
@@ -25,6 +30,12 @@ class PageInfo implements ComputedInterface
     /** @var \Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite */
     private $entityDataProviderComposite;
 
+    /**
+     * @param \Magento\UpwardConnector\Model\PageType $pageTypeResolver
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Serialize\Serializer\Json $json
+     * @param \Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite $entityDataProviderComposite
+     */
     public function __construct(
         PageType $pageTypeResolver,
         StoreManagerInterface $storeManager,
@@ -37,44 +48,52 @@ class PageInfo implements ComputedInterface
         $this->entityDataProviderComposite = $entityDataProviderComposite;
     }
 
+    /**
+     * @param \Magento\Upward\DefinitionIterator $iterator
+     * @param \Magento\Upward\Definition $definition
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function resolve(DefinitionIterator $iterator, Definition $definition)
     {
         $pageInfo = $this->pageTypeResolver
             ->setContext($iterator->getContext())
             ->getInfo();
 
-        if ($pageInfo) {
-            $storeId = (int) $this->storeManager->getStore()->getId();
-            $type = $pageInfo['type'];
-            $additionalMap = $this->getAdditionalMap($definition, $type);
-
-            $entityData = $this->isPageInfoComplete($pageInfo, $additionalMap) ?
-                $pageInfo :
-                $this->entityDataProviderComposite->getData(
-                    $type,
-                    (int)$pageInfo['id'],
-                    null,
-                    $storeId
-                );
-
-            $result = $this->filterData(
-                $entityData,
-                $additionalMap,
-                $type
-            );
-            $result['redirect_code'] = $pageInfo['redirect_code'];
-            $result['relative_url'] = $pageInfo['relative_url'];
-            $result['type'] = $type;
-
-            return $this->json->serialize($result);
+        if (!$pageInfo) {
+            return '';
         }
 
-        return '';
+        $storeId = (int) $this->storeManager->getStore()->getId();
+        $type = $pageInfo['type'];
+        $additionalMap = $this->getAdditionalMap($definition, $type);
+
+        $entityData = $this->isPageInfoComplete($pageInfo, $additionalMap) ?
+            $pageInfo :
+            $this->entityDataProviderComposite->getData(
+                $type,
+                (int)$pageInfo['id'],
+                null,
+                $storeId
+            );
+
+        $result = $this->filterData(
+            $entityData,
+            $additionalMap,
+            $type
+        );
+        $result['redirect_code'] = $pageInfo['redirect_code'];
+        $result['relative_url'] = $pageInfo['relative_url'];
+        $result['type'] = $type;
+
+        return $this->json->serialize($result);
     }
 
     /**
      * @param \Magento\Upward\Definition $definition
      * @param string $type
+     *
      * @return false|string[]
      */
     public function getAdditionalMap(Definition $definition, string $type)
@@ -123,6 +142,8 @@ class PageInfo implements ComputedInterface
     /**
      * @param array $data
      * @param array{type: string, fetch: string}|bool $map
+     *
+     * @return array
      */
     public function filterData($data, $map, $type)
     {
@@ -142,6 +163,7 @@ class PageInfo implements ComputedInterface
      * @param array $data
      * @param string $key
      * @param string $type
+     *
      * @return string|null
      */
     public function getEntityValue(array $data, string $key, string $type)

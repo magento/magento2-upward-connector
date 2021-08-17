@@ -1,10 +1,13 @@
 <?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model;
 
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
@@ -31,6 +34,12 @@ class PageType
     /** @var array|null */
     private $pageType;
 
+    /**
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+     * @param \Magento\UrlRewriteGraphQl\Model\Resolver\UrlRewrite\CustomUrlLocatorInterface $customUrlLocator
+     * @param \Magento\Framework\Serialize\Serializer\Json $json
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         UrlFinderInterface $urlFinder,
@@ -41,6 +50,12 @@ class PageType
         $this->customUrlLocator = $customUrlLocator;
     }
 
+    /**
+     * Get page information
+     *
+     * @return array|string[]|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getInfo(): ?array
     {
         if ($this->pageType === null) {
@@ -50,6 +65,12 @@ class PageType
         return $this->pageType;
     }
 
+    /**
+     * Get the page type
+     *
+     * @return string|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getPageType(): ?string
     {
         $pageInfo = $this->getInfo();
@@ -57,6 +78,12 @@ class PageType
         return $pageInfo['type'] ?? null;
     }
 
+    /**
+     * Set the UPWARD Context
+     *
+     * @param \Magento\Upward\Context $context
+     * @return $this
+     */
     public function setContext(Context $context): self
     {
         $this->context = $context;
@@ -64,23 +91,39 @@ class PageType
         return $this;
     }
 
+    /**
+     * Get UPWARD Context
+     *
+     * @return \Magento\Upward\Context|null
+     */
     public function getContext(): ?Context
     {
         return $this->context;
     }
 
+    /**
+     * Resolve page information
+     *
+     * @return array<string, string>|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function resolvePageInfo(): ?array
     {
+        if (!$this->getContext()) {
+            throw new \RuntimeException('UPWARD Context not set');
+        }
+
         $storeId = (int) $this->storeManager->getStore()->getId();
         $request = $this->getContext()->get('request')->toArray();
         $urlParts = $request['url'];
         $url = $urlParts['pathname'];
         $result = null;
 
-        if (substr($url, 0, 1) === '/' && $url !== '/') {
+        $url = preg_replace('/^\/' . $this->storeManager->getStore()->getCode() . '\//', '/', $url);
+
+        if ($url !== '/' && strpos($url, '/') === 0) {
             $url = ltrim($url, '/');
         }
-        $url = preg_replace('/^' . $this->storeManager->getStore()->getCode() . '\//', '', $url);
 
         $this->redirectType = 0;
         $customUrl = $this->customUrlLocator->locateUrl($url);
@@ -126,7 +169,7 @@ class PageType
             $finalCustomUrlRewrite = clone $finalUrlRewrite;
             $finalUrlRewrite = $this->findFinalUrl($finalCustomUrlRewrite->getTargetPath(), $storeId, true);
             $relativeUrl =
-                $finalCustomUrlRewrite->getRedirectType() == 0
+                (int) $finalCustomUrlRewrite->getRedirectType() === 0
                     ? $finalCustomUrlRewrite->getRequestPath() : $finalUrlRewrite->getRequestPath();
             return [
                 'id' => $finalUrlRewrite->getEntityId(),
