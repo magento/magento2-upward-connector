@@ -38,6 +38,12 @@ class PageType
     /** @var array|null */
     private $pageType;
 
+    /**
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\UrlRewrite\Model\UrlFinderInterface $urlFinder
+     * @param \Magento\UrlRewriteGraphQl\Model\Resolver\UrlRewrite\CustomUrlLocatorInterface $customUrlLocator
+     * @param \Magento\Framework\Serialize\Serializer\Json $json
+     */
     public function __construct(
         StoreManagerInterface $storeManager,
         UrlFinderInterface $urlFinder,
@@ -50,6 +56,12 @@ class PageType
         $this->json = $json;
     }
 
+    /**
+     * Get page information
+     *
+     * @return array|string[]|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getInfo(): ?array
     {
         if ($this->pageType === null) {
@@ -59,6 +71,12 @@ class PageType
         return $this->pageType;
     }
 
+    /**
+     * Get page information as json string
+     *
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getJson(): string
     {
         $pageType = $this->getInfo();
@@ -66,6 +84,12 @@ class PageType
         return $pageType ? $this->json->serialize($pageType) : '';
     }
 
+    /**
+     * Get the page type
+     *
+     * @return string|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getPageType(): ?string
     {
         $pageInfo = $this->getInfo();
@@ -73,6 +97,12 @@ class PageType
         return $pageInfo['type'] ?? null;
     }
 
+    /**
+     * Set the UPWARD Context
+     *
+     * @param \Magento\Upward\Context $context
+     * @return $this
+     */
     public function setContext(Context $context): self
     {
         $this->context = $context;
@@ -80,12 +110,19 @@ class PageType
         return $this;
     }
 
+    /**
+     * Get UPWARD Context
+     *
+     * @return \Magento\Upward\Context|null
+     */
     public function getContext(): ?Context
     {
         return $this->context;
     }
 
     /**
+     * Resolve page information
+     *
      * @return array<string, string>|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */

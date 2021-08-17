@@ -15,6 +15,9 @@ class ComputedPool
     /** @var \Magento\UpwardConnector\Api\ComputedInterface[] */
     private $items;
 
+    /**
+     * @param \Magento\UpwardConnector\Api\ComputedInterface[]|null $items
+     */
     public function __construct(?array $items = [])
     {
         $this->items = $items;

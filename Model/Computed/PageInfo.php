@@ -17,6 +17,9 @@ class PageInfo implements ComputedInterface
     /** @var \Magento\UpwardConnector\Model\PageType */
     private $pageTypeResolver;
 
+    /**
+     * @param \Magento\UpwardConnector\Model\PageType $pageTypeResolver
+     */
     public function __construct(
         PageType $pageTypeResolver
     ) {

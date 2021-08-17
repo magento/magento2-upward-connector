@@ -23,6 +23,10 @@ class WebpackChunks implements ComputedInterface
     /** @var \Magento\Framework\Filesystem\Driver\File */
     private File $driverFile;
 
+    /**
+     * @param \Magento\UpwardConnector\Model\PageType $pageTypeResolver
+     * @param \Magento\Framework\Filesystem\Driver\File $driverFile
+     */
     public function __construct(
         PageType $pageTypeResolver,
         File $driverFile
