@@ -8,72 +8,51 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model\Computed;
 
-use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Math\Random;
 use Magento\Upward\Definition;
 use Magento\Upward\DefinitionIterator;
 use Magento\UpwardConnector\Api\ComputedInterface;
-use Magento\UpwardConnector\Model\PageType;
-
-use function base64_encode;
 
 class PageInfoNonce implements ComputedInterface
 {
-    /** @var \Magento\UpwardConnector\Model\PageType */
-    private $pageTypeResolver;
+    const NONCE_LENGTH = 45;
 
-    /** @var \Magento\Framework\Encryption\EncryptorInterface */
-    private $encryptor;
+    /** @var \Magento\Framework\Math\Random */
+    private $randomGenerator;
 
-    /** @var string|null */
-    private $nonce;
+    /** @var array<string, string> */
+    private $nonces = [];
 
     /**
-     * @param \Magento\UpwardConnector\Model\PageType $pageTypeResolver
-     * @param \Magento\Framework\Encryption\Encryptor $encryptor
+     * @param \Magento\Framework\Math\Random $randomGenerator
      */
     public function __construct(
-        PageType $pageTypeResolver,
-        EncryptorInterface $encryptor
+        Random $randomGenerator
     ) {
-        $this->pageTypeResolver = $pageTypeResolver;
-        $this->encryptor = $encryptor;
+        $this->randomGenerator = $randomGenerator;
     }
 
     /**
      * @param \Magento\Upward\DefinitionIterator $iterator
      * @param \Magento\Upward\Definition $definition
      *
-     * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return array|int|string|null
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function resolve(DefinitionIterator $iterator, Definition $definition)
     {
-        if ($this->nonce === null) {
-            $this->nonce = $this->generateNonce($iterator);
+        if (!isset($this->nonces[$definition->getTreeAddress()])) {
+            $this->nonces[$definition->getTreeAddress()] = $this->generateNonce();
         }
 
-        return $this->nonce;
+        return $this->nonces[$definition->getTreeAddress()];
     }
 
     /**
-     * @param \Magento\Upward\DefinitionIterator $iterator
-     *
-     * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function generateNonce(DefinitionIterator $iterator): string
+    private function generateNonce(): string
     {
-        $pageInfo = $this->pageTypeResolver
-            ->setContext($iterator->getContext())
-            ->getInfo();
-
-        $nonceData = uniqid('', true);
-        if ($pageInfo) {
-            $nonceData = $pageInfo['type'] . $pageInfo['id'] . $nonceData;
-        }
-
-        return base64_encode(
-            $this->encryptor->encrypt($nonceData)
-        );
+        return $this->randomGenerator->getRandomString(self::NONCE_LENGTH);
     }
 }
