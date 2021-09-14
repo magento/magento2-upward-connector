@@ -15,6 +15,7 @@
         <arguments>
             <argument name="items" xsi:type="array">
                 <item name="pageType" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageInfo</item>
+                <item name="pageTypeNonce" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageInfoNonce</item>
                 <item name="webpackChunks" xsi:type="object">Magento\UpwardConnector\Model\Computed\WebpackChunks</item>
             </argument>
         </arguments>
