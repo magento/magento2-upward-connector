@@ -78,6 +78,10 @@ class PageInfo implements ComputedInterface
                 $storeId
             );
 
+        if (empty($entityData)) {
+            return '';
+        }
+
         $result = $this->filterData(
             $entityData,
             $additionalMap,
@@ -147,7 +151,7 @@ class PageInfo implements ComputedInterface
      */
     public function filterData($data, $map, $type)
     {
-        if (!$map || empty($map)) {
+        if (!$map || empty($map) || empty($data)) {
             return [];
         }
 
