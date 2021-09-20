@@ -11,4 +11,22 @@
     <type name="Magento\Framework\App\FrontControllerInterface">
         <plugin name="di_compile_fix" type="Magento\UpwardConnector\Plugin\Magento\Framework\App\DICompileFix" />
     </type>
+    <type name="Magento\UpwardConnector\Model\ComputedPool">
+        <arguments>
+            <argument name="items" xsi:type="array">
+                <item name="pageType" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageInfo</item>
+                <item name="pageTypeNonce" xsi:type="object">Magento\UpwardConnector\Model\Computed\PageInfoNonce</item>
+                <item name="webpackChunks" xsi:type="object">Magento\UpwardConnector\Model\Computed\WebpackChunks</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite">
+        <arguments>
+            <argument name="dataProviders" xsi:type="array">
+                <item name="category" xsi:type="object">Magento\UpwardConnector\Model\DataProvider\UrlRewrite\CatalogDataProvider</item>
+                <item name="product" xsi:type="object">Magento\CatalogUrlRewriteGraphQl\Model\DataProvider\UrlRewrite\ProductDataProvider</item>
+                <item name="cms_page" xsi:type="object">Magento\UpwardConnector\Model\DataProvider\UrlRewrite\PageProvider</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
