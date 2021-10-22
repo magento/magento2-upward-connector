@@ -1,0 +1,30 @@
+{
+    "templateVersion": "0.1",
+    "product": {
+        "name": "Magento 2 UPWARD Connector",
+        "description": "A module for routing requests to UPWARD-PHP. This module replaces the default Magento frontend theme with a PWA Studio storefront application."
+    },
+    "contacts": {
+        "team": {
+            "name": "The Untitled Geese",
+            "DL": "Grp-Untitled-Geese",
+            "slackChannel": "pwa"
+        }
+    },
+    "ticketTracker": {
+        "functionalJiraQueue": {
+            "projectKey": "PWA",
+            "component": ""
+        },
+        "securityJiraQueue": {
+            "projectKey": "MAGREQ",
+            "component": "PWA"
+        }
+    },
+    "staticScan": {
+        "enable": false,
+        "frequency": "quarterly",
+        "customName": "Magento 2 UPWARD Connector Static Scan",
+        "branchesToScan": ["develop"]
+    }
+}
