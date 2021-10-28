@@ -10,6 +10,11 @@
         "magento/upward": "*",
         "magento/module-config": "*",
         "magento/module-store": "*",
+        "magento/module-catalog": "*",
+        "magento/module-cms": "*",
+        "magento/module-url-rewrite": "*",
+        "magento/module-url-rewrite-graph-ql": "*",
+        "magento/module-catalog-url-rewrite-graph-ql": "*",
         "yireo/magento2-disable-service-worker-in-admin": "^0.0.2"
     },
     "type": "magento2-module",
