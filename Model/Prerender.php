@@ -121,7 +121,7 @@ class Prerender
     public function shouldShowPrerenderedPage(RequestInterface $request)
     {
         if (!$this->getPrerenderUrl() ||
-            !$this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER, scopeInterface::SCOPE_STORE)
+            !$this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER, ScopeInterface::SCOPE_STORE)
         ) {
             return false;
         }
@@ -156,7 +156,7 @@ class Prerender
      */
     private function getPrerenderToken()
     {
-        return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_TOKEN);
+        return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_TOKEN, ScopeInterface::SCOPE_WEBSITE);
     }
 
     /**
@@ -166,7 +166,7 @@ class Prerender
      */
     private function getPrerenderUrl()
     {
-        return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_URL);
+        return $this->config->getValue(static::XML_PATH_WEB_UPWARD_PRERENDER_URL, ScopeInterface::SCOPE_WEBSITE);
     }
 
     /**
@@ -190,7 +190,7 @@ class Prerender
         }
 
         $crawlerUserAgents = $this->getList(
-            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS)
+            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS, ScopeInterface::SCOPE_WEBSITE)
         );
 
         foreach ($crawlerUserAgents as $crawlerUserAgent) {
@@ -211,7 +211,7 @@ class Prerender
     private function isInAllowedList(string $requestUri)
     {
         $allowedList = $this->getList(
-            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST)
+            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST, ScopeInterface::SCOPE_WEBSITE)
         );
 
         return empty($allowedList) || $this->isListed([$requestUri], $allowedList);
@@ -226,7 +226,7 @@ class Prerender
     private function isInBlockedList(array $uris)
     {
         $blockedList = $this->getList(
-            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST)
+            (string) $this->config->getValue(self::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST, ScopeInterface::SCOPE_WEBSITE)
         );
 
         return !empty($blockedList) && $this->isListed($uris, $blockedList);

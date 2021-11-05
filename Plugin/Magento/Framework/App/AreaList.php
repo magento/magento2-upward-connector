@@ -8,7 +8,9 @@ declare(strict_types=1);
 namespace Magento\UpwardConnector\Plugin\Magento\Framework\App;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ObjectManager;
 use Magento\Store\Model\ScopeInterface;
+use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 
 class AreaList
 {
@@ -18,16 +20,25 @@ class AreaList
     private $scopeConfig;
 
     /**
+     * @var \Magento\UpwardConnector\Api\UpwardPathManagerInterface
+     */
+    private $pathManager;
+
+    /**
      * Controller or frontname to load from default magento frontend
      */
     const UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP = 'web/upward/front_names_to_skip';
 
     /**
-     * @param ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\UpwardConnector\Api\UpwardPathManagerInterface|null $pathManager
      */
-    public function __construct(ScopeConfigInterface $scopeConfig)
-    {
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        ?UpwardPathManagerInterface $pathManager = null
+    ) {
         $this->scopeConfig = $scopeConfig;
+        $this->pathManager = $pathManager ?: ObjectManager::getInstance()->get(UpwardPathManagerInterface::class);
     }
 
     /**
@@ -46,7 +57,11 @@ class AreaList
         $frontName
     ) {
 
-        if ($result != 'frontend') {
+        if ($result !== 'frontend') {
+            return $result;
+        }
+
+        if (!$this->pathManager->getPath()) {
             return $result;
         }
 

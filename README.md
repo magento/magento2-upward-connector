@@ -22,12 +22,53 @@ These are the configurations for the UPWARD process itself.
 #### UPWARD Config File
 
 This configuration is the location of the UPWARD configuration file for the UPWARD-PHP server.
-It is recommended you follow [system-specific best practices][] and set this value with an environment variable or the `magento config:set` CLI command.
+
+This module adds a new directive to the env.php to securely set the path to the upward.yaml file.
+```php
+    // ...
+    'downloadable_domains' => [
+        // ...
+    ],
+    # New configuration point
+    'pwa_path' => [
+        'default' => [
+            'default' => '/var/www/html/pwa/dist/upward.yml'
+        ],
+        'website' => [
+            '<website_code>' => '/var/www/html/anotherpwa/dist/upward.yml' # Can point a website to a different installation
+        ],
+        'store' => [
+            '<store_code>' => '' # Blank string (or false) to serve default Magento storefront
+        ]
+    ]
+```
+
+For ease of use, this module provides a new command for setting the path
+```shell
+# Set the default scope to an empty string (will serve base Magento store front)
+bin/magento pwa:upward:set
+
+# Set the website with code <website_code> to /var/www/html/pwa/dist/upward.yml
+bin/magento pwa:upward:set --path /var/www/html/pwa/dist/upward.yml --scopeType website --scopeCode <website_code>
+
+# Set the website with code <website_code> to an empty string (will serve base Magento store front)
+bin/magento pwa:upward:set --scopeType website --scopeCode <website_code>
+
+# Set the website with code <store_code> to /var/www/html/pwa/dist/upward.yml
+bin/magento pwa:upward:set --path /var/www/html/pwa/dist/upward.yml --scopeType store --scopeCode <store_code>
+```
+
+_You can use `bin/magento store:list` or `bin/magento store:website:list` to easily get the store/website code for configuration._
 
 _You may use a path relative to your web root or an absolute path for the value of this configuration._
+- Relative: `pwa/dist/upward.yml`
+- Absolute: `/var/www/html/pwa/dist/upward.yml`
 
-Relative: `fastcgi_param CONFIG__DEFAULT__WEB__UPWARD__PATH pwa/upward.yml`
-Absolute: `magento config:set -e web/upward/path /app/node_modules/@magento/venia-concept/dist/upward.yml`
+If you have previously configured the UPWARD yaml path using the `config:set` command or environment variables, it will continue to work as a fallback, so long as no
+default has been set as per the example above.
+
+The configuration works the same way normal store configurations work. It falls back from store view > website > global (default),
+trying to serve the more specific available scope first.
 
 #### Front Name Allowlist
 

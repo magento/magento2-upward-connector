@@ -7,19 +7,19 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Test\Unit\Controller;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
+use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Magento\UpwardConnector\Controller\UpwardControllerFactory;
 
 class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeConfigInterface|MockObject
+     * @var UpwardPathManagerInterface|MockObject
      */
-    private $config;
+    private $pathManager;
 
     /**
      * @var ObjectManagerInterface|MockObject
@@ -35,10 +35,10 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
         $this->objectManager = $this->createMock(ObjectManagerInterface::class);
-        $this->config = $this->createMock(ScopeConfigInterface::class);
+        $this->pathManager = $this->createMock(UpwardPathManagerInterface::class);
         $this->upwardControllerFactory = $objectManagerHelper->getObject(UpwardControllerFactory::class, [
             'objectManager' => $this->objectManager,
-            'config' => $this->config
+            'pathManager' => $this->pathManager
         ]);
     }
 
@@ -47,9 +47,8 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
         $request = $this->createMock(RequestInterface::class);
         $upwardControllerMock = $this->createMock(UpwardController::class);
         $upwardConfig = 'upward/config/path';
-        $this->config->expects($this->once())
-            ->method('getValue')
-            ->with(UpwardControllerFactory::UPWARD_CONFIG_PATH, 'default')
+        $this->pathManager->expects($this->once())
+            ->method('getPath')
             ->willReturn($upwardConfig);
         $this->objectManager->expects($this->once())
             ->method('create')
@@ -62,9 +61,8 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateWillThrow()
     {
         $requestMock = $this->createMock(RequestInterface::class);
-        $this->config->expects($this->once())
-            ->method('getValue')
-            ->with(UpwardControllerFactory::UPWARD_CONFIG_PATH, 'default')
+        $this->pathManager->expects($this->once())
+            ->method('getPath')
             ->willReturn(null);
         $this->objectManager->expects($this->never())->method('create');
 

@@ -7,36 +7,33 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Controller;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
+use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 
 class UpwardControllerFactory
 {
-    /**
-     * Config path where UPWARD config file path is found.
-     */
-    public const UPWARD_CONFIG_PATH = 'web/upward/path';
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $config;
-
     /**
      * @var ObjectManagerInterface
      */
     private $objectManager;
 
     /**
-     * @param ObjectManagerInterface $objectManager
-     * @param ScopeConfigInterface $scopeConfig
+     * @var \Magento\UpwardConnector\Api\UpwardPathManagerInterface
      */
-    public function __construct(ObjectManagerInterface $objectManager, ScopeConfigInterface $scopeConfig)
-    {
+    private $pathManager;
+
+    /**
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param \Magento\UpwardConnector\Api\UpwardPathManagerInterface $pathManager
+     */
+    public function __construct(
+        ObjectManagerInterface $objectManager,
+        UpwardPathManagerInterface $pathManager
+    ) {
         $this->objectManager = $objectManager;
-        $this->config = $scopeConfig;
+        $this->pathManager = $pathManager;
     }
 
     /**
@@ -48,10 +45,7 @@ class UpwardControllerFactory
      */
     public function create(RequestInterface $request): UpwardController
     {
-        $upwardConfig = $this->config->getValue(
-            static::UPWARD_CONFIG_PATH,
-            ScopeConfigInterface::SCOPE_TYPE_DEFAULT
-        );
+        $upwardConfig = $this->pathManager->getPath();
 
         if (empty($upwardConfig)) {
             throw new \RuntimeException('Path to UPWARD configuration file not set.');
