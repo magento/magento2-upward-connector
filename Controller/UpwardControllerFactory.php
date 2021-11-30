@@ -11,6 +11,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
 use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
+use Magento\UpwardConnector\Resolver\Computed;
 
 class UpwardControllerFactory
 {
@@ -51,6 +52,17 @@ class UpwardControllerFactory
             throw new \RuntimeException('Path to UPWARD configuration file not set.');
         }
 
-        return $this->objectManager->create(UpwardController::class, compact('request', 'upwardConfig'));
+        $additionalResolvers = [
+            Computed::RESOLVER_TYPE => Computed::class
+        ];
+
+        return $this->objectManager->create(
+            UpwardController::class,
+            compact(
+                'request',
+                'upwardConfig',
+                'additionalResolvers'
+            )
+        );
     }
 }
