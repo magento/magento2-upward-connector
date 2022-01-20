@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model\Computed;
 
+use Magento\Framework\GraphQl\Query\Uid;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Upward\Definition;
@@ -30,6 +31,9 @@ class PageInfo implements ComputedInterface
     /** @var \Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite */
     private $entityDataProviderComposite;
 
+    /** @var \Magento\Framework\GraphQl\Query\Uid */
+    private $uid;
+
     /**
      * @param \Magento\UpwardConnector\Model\PageType $pageTypeResolver
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -40,12 +44,14 @@ class PageInfo implements ComputedInterface
         PageType $pageTypeResolver,
         StoreManagerInterface $storeManager,
         Json $json,
-        EntityDataProviderComposite $entityDataProviderComposite
+        EntityDataProviderComposite $entityDataProviderComposite,
+        Uid $uid
     ) {
         $this->pageTypeResolver = $pageTypeResolver;
         $this->storeManager = $storeManager;
         $this->json = $json;
         $this->entityDataProviderComposite = $entityDataProviderComposite;
+        $this->uid = $uid;
     }
 
     /**
@@ -131,7 +137,7 @@ class PageInfo implements ComputedInterface
     {
         $pageInfoHasAllData = true;
         if ($additionalMap) {
-            foreach($additionalMap as $key) {
+            foreach ($additionalMap as $key) {
                 if (!isset($pageInfo[$key])) {
                     $pageInfoHasAllData = false;
 
@@ -145,7 +151,8 @@ class PageInfo implements ComputedInterface
 
     /**
      * @param array $data
-     * @param array{type: string, fetch: string}|bool $map
+     * @param array|bool $map
+     * @param string $type
      *
      * @return array
      */
@@ -156,7 +163,7 @@ class PageInfo implements ComputedInterface
         }
 
         $result = [];
-        foreach($map as $valueKey) {
+        foreach ($map as $valueKey) {
             $result[$valueKey] = $this->getEntityValue($data, $valueKey, $type);
         }
 
@@ -182,6 +189,10 @@ class PageInfo implements ComputedInterface
 
         if ($key === 'id') {
             return $data['id'] ?? $data['entity_id'];
+        }
+
+        if ($key === 'uid' && (isset($data['id']) || isset($data['entity_id']))) {
+            return $this->uid->encode($data['id'] ?? $data['entity_id']);
         }
 
         return $data[$key] ?? null;
