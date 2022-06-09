@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Magento\UpwardConnector\Plugin\Magento\Framework\App;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Request\Http as Request;
 use Magento\Framework\App\ObjectManager;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Upward\Resolver\Proxy;
 use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 
 class AreaList
@@ -19,6 +19,11 @@ class AreaList
     public const UPWARD_HEADER = 'UpwardProxied';
 
     public const UPWARD_ENV_HEADER = 'UPWARD_PHP_PROXY_HEADER';
+
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    private $request;
 
     /**
      * @var ScopeConfigInterface
@@ -36,13 +41,16 @@ class AreaList
     const UPWARD_CONFIG_PATH_FRONT_NAMES_TO_SKIP = 'web/upward/front_names_to_skip';
 
     /**
+     * @param Request $httpRequest
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\UpwardConnector\Api\UpwardPathManagerInterface|null $pathManager
      */
     public function __construct(
+        Request $httpRequest,
         ScopeConfigInterface $scopeConfig,
         ?UpwardPathManagerInterface $pathManager = null
     ) {
+        $this->request = $httpRequest;
         $this->scopeConfig = $scopeConfig;
         $this->pathManager = $pathManager ?: ObjectManager::getInstance()->get(UpwardPathManagerInterface::class);
     }
@@ -78,11 +86,10 @@ class AreaList
             ) ?? ''
         );
 
-        $request = new \Laminas\Http\PhpEnvironment\Request();
         $upwardProxyEnv = getenv(self::UPWARD_ENV_HEADER);
 
         /** $upwardProxyEnv needs to be truthy because getenv returns "false" if it didn't find it */
-        if ($upwardProxyEnv && $request->getHeader(self::UPWARD_HEADER) === $upwardProxyEnv) {
+        if ($upwardProxyEnv && $this->request->getHeader(self::UPWARD_HEADER) === $upwardProxyEnv) {
             return $result;
         }
 
