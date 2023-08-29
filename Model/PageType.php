@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Magento\UpwardConnector\Model;
 
+use Magento\Framework\Exception\RuntimeException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\UrlRewrite\Model\UrlFinderInterface;
 use Magento\UrlRewrite\Service\V1\Data\UrlRewrite;
@@ -110,7 +111,7 @@ class PageType
     public function resolvePageInfo(): ?array
     {
         if (!$this->getContext()) {
-            throw new \RuntimeException('UPWARD Context not set');
+            throw new RuntimeException('UPWARD Context not set');
         }
 
         $storeId = (int) $this->storeManager->getStore()->getId();
@@ -144,7 +145,7 @@ class PageType
             }
 
             if (empty($resultArray['id'])) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     __('No such entity found with matching URL key: %url', ['url' => $url])
                 );
             }
