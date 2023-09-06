@@ -111,7 +111,7 @@ class PageType
     public function resolvePageInfo(): ?array
     {
         if (!$this->getContext()) {
-            throw new RuntimeException('UPWARD Context not set');
+            throw new RuntimeException(__('UPWARD Context not set'));
         }
 
         $storeId = (int) $this->storeManager->getStore()->getId();
