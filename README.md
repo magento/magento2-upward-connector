@@ -19,6 +19,20 @@ The Magento 2 UPWARD connector has additional settings that can be configured in
 
 These are the configurations for the UPWARD process itself.
 
+#### UPWARD Environment variable
+
+This environment variable is meant to allow a secure way for Magento2 to distinguish a request which went through the UPWARD Proxy, and a "natural" request.
+
+```
+# bash
+export UPWARD_PHP_PROXY_HEADER='arbitrary_security_string' # preferably random, unique and longer than 16 characters
+
+# nginx conf
+fastcgi_param  UPWARD_PHP_PROXY_HEADER "arbitrary_security_string";
+
+```
+
+
 #### UPWARD Config File
 
 This configuration is the location of the UPWARD configuration file for the UPWARD-PHP server.
