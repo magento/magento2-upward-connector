@@ -16,6 +16,7 @@ use Magento\Upward\DefinitionIterator;
 use Magento\UpwardConnector\Api\ComputedInterface;
 use Magento\UpwardConnector\Model\PageType;
 use Magento\UrlRewriteGraphQl\Model\DataProvider\EntityDataProviderComposite;
+use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 
 class PageInfo implements ComputedInterface
 {
@@ -75,14 +76,19 @@ class PageInfo implements ComputedInterface
         $type = $pageInfo['type'];
         $additionalMap = $this->getAdditionalMap($definition, $type);
 
-        $entityData = $this->isPageInfoComplete($pageInfo, $additionalMap) ?
-            $pageInfo :
-            $this->entityDataProviderComposite->getData(
-                $type,
-                (int)$pageInfo['id'],
-                null,
-                $storeId
-            );
+        try {
+                $entityData = $this->isPageInfoComplete($pageInfo, $additionalMap) ?
+                $pageInfo :
+                $this->entityDataProviderComposite->getData(
+                    $type,
+                    (int)$pageInfo['id'],
+                    null,
+                    $storeId
+                );
+        } catch (GraphQlNoSuchEntityException $e) {
+            // Convert to a handled "not found" case instead of 500
+            return '';
+        }
 
         if (empty($entityData)) {
             return '';
