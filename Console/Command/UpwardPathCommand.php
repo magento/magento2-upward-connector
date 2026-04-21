@@ -72,7 +72,7 @@ class UpwardPathCommand extends Command
     /**
      * @inheritdoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {
             $path = $input->getOption(self::UPWARD_PATH);
