@@ -12,6 +12,7 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Upward\Controller as UpwardController;
 use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 use Magento\UpwardConnector\Resolver\Computed;
+use Magento\UpwardConnector\Resolver\InternalService;
 
 class UpwardControllerFactory
 {
@@ -53,7 +54,8 @@ class UpwardControllerFactory
         }
 
         $additionalResolvers = [
-            Computed::RESOLVER_TYPE => Computed::class
+            Computed::RESOLVER_TYPE => Computed::class,
+            InternalService::RESOLVER_TYPE => InternalService::class
         ];
 
         return $this->objectManager->create(
