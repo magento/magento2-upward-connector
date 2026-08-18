@@ -177,11 +177,12 @@ class Prerender
      */
     private function isCrawlerUserAgent(RequestInterface $request)
     {
-        $userAgent = strtolower($request->getServer('HTTP_USER_AGENT'));
-        if (!$userAgent) {
+        $userAgent = $request->getServer('HTTP_USER_AGENT');
+        if (!is_string($userAgent) || $userAgent === '') {
             return false;
         }
 
+        $userAgent = strtolower($userAgent);
         $bufferAgent = $request->getServer('X-BUFFERBOT');
 
         // prerender if _escaped_fragment_ is in the query string
@@ -194,7 +195,7 @@ class Prerender
         );
 
         foreach ($crawlerUserAgents as $crawlerUserAgent) {
-            if (strpos(strtolower($userAgent), strtolower($crawlerUserAgent)) !== false) {
+            if (strpos($userAgent, strtolower($crawlerUserAgent)) !== false) {
                 return true;
             }
         }
