@@ -212,6 +212,67 @@ class PrerenderTest extends TestCase
     }
 
     /**
+     * @dataProvider unmatchableSubjectDataProvider
+     * @param string $requestUri
+     * @param string|false $referer
+     * @param string|null $allowedList
+     * @param bool $expectedResult
+     */
+    public function testShouldShowPrerenderedPageWithUnmatchableRequestUriOrReferer(
+        string $requestUri,
+        $referer,
+        ?string $allowedList,
+        bool $expectedResult
+    ) {
+        $values = [
+            Prerender::XML_PATH_WEB_UPWARD_PRERENDER => true,
+            Prerender::XML_PATH_WEB_UPWARD_PRERENDER_URL => 'https://example.com/',
+            Prerender::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS => 'googlebot',
+            Prerender::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST => $allowedList,
+            Prerender::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST => "*.js\n*.css",
+        ];
+        $this->config->method('getValue')
+            ->willReturnCallback(static fn (string $path) => $values[$path] ?? null);
+        $this->requestMock->method('getServer')
+            ->willReturnCallback(static fn (string $key) => $key === 'HTTP_USER_AGENT' ? 'Googlebot/2.1' : null);
+        $this->requestMock->method('isGet')->willReturn(true);
+        $this->requestMock->method('getRequestUri')->willReturn($requestUri);
+        $this->requestMock->method('getHeader')->willReturn($referer);
+        $this->requestMock->method('getQuery')->willReturn(null);
+
+        set_error_handler(
+            static function (int $errno, string $errstr): never {
+                throw new \ErrorException($errstr, 0, $errno);
+            }
+        );
+        try {
+            $this->assertSame($expectedResult, $this->prerenderer->shouldShowPrerenderedPage($this->requestMock));
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public function unmatchableSubjectDataProvider(): array
+    {
+        $oversized = '/' . str_repeat('a', PHP_MAXPATHLEN);
+        $atLimit = '/' . str_repeat('a', PHP_MAXPATHLEN - 1);
+        $belowLimit = '/' . str_repeat('a', PHP_MAXPATHLEN - 2);
+
+        return [
+            'Oversized referer' => ['/test.html', 'https://example.com' . $oversized, null, false],
+            'Oversized request uri' => [$oversized . '.html', '', null, false],
+            'Oversized request uri, missing referer' => [$oversized . '.html', false, null, false],
+            'Oversized request uri matching blocked list' => [$oversized . '.js', '', null, false],
+            'Oversized request uri, allow-all list' => [$oversized . '.html', '', '*', false],
+            'Request uri of exactly the limit' => [$atLimit, '', null, false],
+            'Request uri below the limit' => [$belowLimit, '', null, true],
+            'Request uri below the limit, missing referer' => [$belowLimit, false, null, true],
+            'NUL byte in request uri' => ["/test\0.html", '', null, false],
+            'NUL byte in referer' => ['/test.html', "https://example.com/\0", null, false],
+        ];
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
