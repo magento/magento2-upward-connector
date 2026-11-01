@@ -132,6 +132,10 @@ class Prerender
             return false;
         }
 
+        if ($this->isUnmatchable((string) $requestUri) || $this->isUnmatchable((string) $referer)) {
+            return false;
+        }
+
         if (!$this->isInAllowedList($requestUri)) {
             return false;
         }
@@ -147,6 +151,17 @@ class Prerender
         }
 
         return true;
+    }
+
+    /**
+     * Check if the value cannot be passed to fnmatch() without an error.
+     *
+     * @param string $value
+     * @return bool
+     */
+    private function isUnmatchable(string $value)
+    {
+        return strlen($value) >= PHP_MAXPATHLEN || str_contains($value, "\0");
     }
 
     /**
