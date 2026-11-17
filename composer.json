@@ -2,7 +2,11 @@
     "name": "magento/module-upward-connector",
     "description": "Magento module used for routing all frontend requests through UPWARD-PHP.",
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        }
     },
     "require": {
         "php": "~8.2.0||~8.3.0||~8.4.0||~8.5.0",
@@ -29,5 +33,11 @@
         "psr-4": {
             "Magento\\UpwardConnector\\": ""
         }
+    },
+    "require-dev": {
+        "bitexpert/phpstan-magento": "^0.44",
+        "magento/magento-coding-standard": "^41",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1"
     }
 }
