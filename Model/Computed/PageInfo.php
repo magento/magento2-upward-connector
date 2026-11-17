@@ -164,7 +164,7 @@ class PageInfo implements ComputedInterface
      */
     public function filterData($data, $map, $type)
     {
-        if (!$map || empty($map) || empty($data)) {
+        if (empty($map) || empty($data)) {
             return [];
         }
 

@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Magento\UpwardConnector\Test\Unit\Controller;
+namespace Magento\UpwardConnector\Test\Unit\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\DeploymentConfig;
@@ -36,30 +36,28 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeConfigInterface|MockObject */
     private $scopeConfig;
 
-    /**
-     * @var UpwardPathManager
-     */
-    private $pathManager;
-
     protected function setUp() : void
     {
-        $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        $this->configWriter = $this->createStub(ConfigWriter::class);
+        $this->deploymentConfig = $this->createStub(DeploymentConfig::class);
+        $this->storeManager = $this->createStub(StoreManagerInterface::class);
+        $this->scopeConfig = $this->createStub(ScopeConfigInterface::class);
+    }
 
-        $this->configWriter = $this->createMock(ConfigWriter::class);
-        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
-        $this->storeManager = $this->createMock(StoreManagerInterface::class);
-        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
-
-        $this->pathManager = $objectManagerHelper->getObject(UpwardPathManager::class, [
-            'configWriter' => $this->configWriter,
-            'deploymentConfig' => $this->deploymentConfig,
-            'storeManager' => $this->storeManager,
-            'scopeConfig' => $this->scopeConfig
-        ]);
+    private function getPathManager(): UpwardPathManager
+    {
+        return new UpwardPathManager(
+            $this->configWriter,
+            $this->deploymentConfig,
+            $this->storeManager,
+            $this->scopeConfig
+        );
     }
 
     public function testHandlesEmptyConfiguration()
     {
+        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->deploymentConfig->expects($this->once())
             ->method('get')
             ->with(UpwardPathManagerInterface::PARAM_PATH_CONFIG)
@@ -70,11 +68,13 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
             ->with(UpwardPathManager::LEGACY_CONFIG_PATH)
             ->willReturn(null);
 
-        $this->assertSame(null, $this->pathManager->getPath());
+        $this->assertSame(null, $this->getPathManager()->getPath());
     }
 
     public function testReturnsStoreValue()
     {
+        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $upwardPath = '/website/path/to/upward';
         $this->deploymentConfig->expects($this->once())
             ->method('get')
@@ -98,11 +98,13 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
             ->with(UpwardPathManager::LEGACY_CONFIG_PATH)
             ->willReturn(null);
 
-        $this->assertSame($upwardPath, $this->pathManager->getPath());
+        $this->assertSame($upwardPath, $this->getPathManager()->getPath());
     }
 
     public function testFallsbackToWebsite()
     {
+        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $upwardPath = '/website/path/to/upward';
         $this->deploymentConfig->expects($this->once())
             ->method('get')
@@ -123,11 +125,13 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
             ->with(UpwardPathManager::LEGACY_CONFIG_PATH)
             ->willReturn(null);
 
-        $this->assertSame($upwardPath, $this->pathManager->getPath());
+        $this->assertSame($upwardPath, $this->getPathManager()->getPath());
     }
 
     public function testFallsbackToDefault()
     {
+        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $upwardPath = '/default/path/to/upward';
         $this->deploymentConfig->expects($this->once())
             ->method('get')
@@ -145,11 +149,13 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
             ->with(UpwardPathManager::LEGACY_CONFIG_PATH)
             ->willReturn(null);
 
-        $this->assertSame($upwardPath, $this->pathManager->getPath());
+        $this->assertSame($upwardPath, $this->getPathManager()->getPath());
     }
 
     public function testFallsbackToLegacyConfiguration()
     {
+        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $upwardPath = '/legacy/path/to/upward';
         $this->deploymentConfig->expects($this->once())
             ->method('get')
@@ -161,11 +167,14 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
             ->with(UpwardPathManager::LEGACY_CONFIG_PATH)
             ->willReturn($upwardPath);
 
-        $this->assertSame($upwardPath, $this->pathManager->getPath());
+        $this->assertSame($upwardPath, $this->getPathManager()->getPath());
     }
 
     public function testWrittingConfiguration()
     {
+        $this->deploymentConfig = $this->createMock(DeploymentConfig::class);
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
+        $this->configWriter = $this->createMock(ConfigWriter::class);
         $pathToWrite = '/some/path';
         $this->deploymentConfig->expects($this->once())
             ->method('get')
@@ -186,7 +195,7 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
                 $writeArguments = $config;
             });
 
-        $this->pathManager->setPath(
+        $this->getPathManager()->setPath(
             $pathToWrite,
             UpwardPathManagerInterface::SCOPE_STORE,
             self::STORE_CODE
@@ -208,6 +217,7 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testWrittingInvalidStoreWillThrow()
     {
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->storeManager
             ->expects($this->once())
             ->method('getWebsites')
@@ -216,23 +226,21 @@ class UpwardPathManagerTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->expectException(LocalizedException::class);
         $this->expectExceptionMessage('Scope code unavailable for given type');
-        $this->pathManager->setPath('/some/path', UpwardPathManagerInterface::SCOPE_WEBSITE, 'foo');
+        $this->getPathManager()->setPath('/some/path', UpwardPathManagerInterface::SCOPE_WEBSITE, 'foo');
     }
 
     private function mockStoreManager()
     {
-        $mockStore = $this->createMock(StoreInterface::class);
+        $mockStore = $this->createStub(StoreInterface::class);
         $mockStore->method('getCode')->willReturn(self::STORE_CODE);
 
-        $mockWebsite = $this->createMock(WebsiteInterface::class);
+        $mockWebsite = $this->createStub(WebsiteInterface::class);
         $mockWebsite->method('getCode')->willReturn(self::WEBSITE_CODE);
 
-        $this->storeManager->expects($this->any())
-            ->method('getStore')
+        $this->storeManager->method('getStore')
             ->willReturn($mockStore);
 
-        $this->storeManager->expects($this->any())
-            ->method('getWebsite')
+        $this->storeManager->method('getWebsite')
             ->willReturn($mockWebsite);
     }
 }

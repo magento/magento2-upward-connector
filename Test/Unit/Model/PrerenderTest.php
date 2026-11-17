@@ -16,6 +16,8 @@ use Psr\Log\LoggerInterface;
 use \Magento\UpwardConnector\Model\Prerender;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Magento\Framework\App\Request\Http;
 use Laminas\Http\Client;
 use Laminas\Http\Response;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
@@ -55,40 +57,12 @@ class PrerenderTest extends TestCase
     protected function setUp() : void
     {
         $objectManagerHelper = new ObjectManager($this);
-        $this->config = $this->getMockForAbstractClass(ScopeConfigInterface::class);
-        $logger = $this->getMockForAbstractClass(LoggerInterface::class);
+        $this->config = $this->createStub(ScopeConfigInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
-        $this->clientFactoryMock = $this->getMockBuilder(ClientFactory::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['create'])
-            ->getMock();
-
-        $this->clientMock = $this->getMockBuilder(Client::class)
-            ->onlyMethods(
-                [
-                    'setUri',
-                    'setOptions',
-                    'setHeaders',
-                    'send'
-                ]
-            )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestMock = $this->getMockBuilder(RequestInterface::class)
-            ->addMethods(
-                [
-                    'isGet',
-                    'getHeader',
-                    'getServer',
-                    'getHttpHost',
-                    'getRequestUri',
-                    'getQuery'
-                ]
-            )
-            ->getMockForAbstractClass();
-
-        $this->escaper = $this->createMock(Escaper::class);
+        $this->clientFactoryMock = $this->createStub(ClientFactory::class);
+        $this->requestMock = $this->createStub(Http::class);
+        $this->escaper = $this->createStub(Escaper::class);
         $this->prerenderer = $objectManagerHelper->getObject(Prerender::class, [
             'clientFactory' => $this->clientFactoryMock,
             'config' => $this->config,
@@ -102,18 +76,19 @@ class PrerenderTest extends TestCase
      */
     public function testGetPrerenderedPageResponse()
     {
-        $responseMock = $this->createMock(Response::class);
+        $responseMock = $this->createStub(Response::class);
+        $this->requestMock = $this->createMock(Http::class);
+        $this->clientMock = $this->createMock(Client::class);
 
         $this->requestMock->expects($this->once())
             ->method('getServer')
             ->with('HTTP_USER_AGENT')
             ->willReturn('googlebot');
-        $this->config->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnValueMap([
-                [$this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_URL, 'default', null, 'https://example.com/'],
-                [$this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_TOKEN, 'default', null, 'token'],
-            ]));
+        $this->config->method('getValue')
+            ->willReturnMap([
+                [$this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_URL, ScopeInterface::SCOPE_WEBSITE, null, 'https://example.com/'],
+                [$this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_TOKEN, ScopeInterface::SCOPE_WEBSITE, null, 'token'],
+            ]);
         $this->requestMock->expects($this->once())
             ->method('isSecure')
             ->willReturn(true);
@@ -123,12 +98,12 @@ class PrerenderTest extends TestCase
         $this->requestMock->expects($this->once())
             ->method('getRequestUri')
             ->willReturn('/');
-        $this->escaper->expects($this->once())
-            ->method('escapeUrl')
-            ->with('https://example.com/https://example.com')
-            ->willReturn('https://example.com/https://example.com');
-        $this->clientFactoryMock->expects($this->once())
-            ->method('create')
+        $this->escaper->method('escapeUrl')
+            ->willReturnCallback(function ($url) {
+                $this->assertSame('https://example.com/https://example.com', $url);
+                return $url;
+            });
+        $this->clientFactoryMock->method('create')
             ->willReturn($this->clientMock);
         $this->clientMock->expects($this->once())
             ->method('setUri')
@@ -152,60 +127,54 @@ class PrerenderTest extends TestCase
      * @param array $testingData
      * @param bool $expectedResult
      */
+    #[DataProvider('shouldShowPrerenderedDataProvider')]
     public function testShouldShowPrerenderedPage(array $testingData, bool $expectedResult)
     {
-        $this->config->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnValueMap([
+        $this->config->method('getValue')
+            ->willReturnMap([
                 [
                     $this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER,
-                    scopeInterface::SCOPE_STORE,
+                    ScopeInterface::SCOPE_STORE,
                     null,
                     $testingData['prerenderEnabled']
                 ],
                 [
                     $this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_URL,
-                    'default',
+                    ScopeInterface::SCOPE_WEBSITE,
                     null,
                     $testingData['prerenderUrl']
                 ],
                 [
                     $this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_CRAWLERS,
-                    'default',
+                    ScopeInterface::SCOPE_WEBSITE,
                     null,
                     $testingData['crawlerUserAgents']
                 ],
                 [
                     $this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_ALLOWED_LIST,
-                    'default',
+                    ScopeInterface::SCOPE_WEBSITE,
                     null,
                     $testingData['allowedList']
                 ],
                 [
                     $this->prerenderer::XML_PATH_WEB_UPWARD_PRERENDER_BLOCKED_LIST,
-                    'default',
+                    ScopeInterface::SCOPE_WEBSITE,
                     null,
                     $testingData['blockedList']
                 ]
-            ]));
-        $this->requestMock->expects($this->any())
-            ->method('getServer')
-            ->will($this->returnValueMap([
-                ['HTTP_USER_AGENT', $testingData['userAgent']],
-                ['X-BUFFERBOT', $testingData['bufferAgent']]
-            ]));
-        $this->requestMock->expects($this->any())
-            ->method('isGet')
+            ]);
+        $this->requestMock->method('getServer')
+            ->willReturnMap([
+                ['HTTP_USER_AGENT', null, $testingData['userAgent']],
+                ['X-BUFFERBOT', null, $testingData['bufferAgent']]
+            ]);
+        $this->requestMock->method('isGet')
             ->willReturn(true);
-        $this->requestMock->expects($this->any())
-            ->method('getRequestUri')
+        $this->requestMock->method('getRequestUri')
             ->willReturn($testingData['requestUri']);
-        $this->requestMock->expects($this->any())
-            ->method('getHeader')
+        $this->requestMock->method('getHeader')
             ->willReturn($testingData['referer']);
-        $this->requestMock->expects($this->any())
-            ->method('getQuery')
-            ->with('_escaped_fragment_')
+        $this->requestMock->method('getQuery')
             ->willReturn($testingData['escapedFragment']);
 
         $this->assertSame($expectedResult, $this->prerenderer->shouldShowPrerenderedPage($this->requestMock));
@@ -215,7 +184,7 @@ class PrerenderTest extends TestCase
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
-    public function shouldShowPrerenderedDataProvider(): array
+    public static function shouldShowPrerenderedDataProvider(): array
     {
         return [
             'Should prerender when google bot' => [

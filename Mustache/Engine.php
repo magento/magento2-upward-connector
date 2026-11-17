@@ -343,11 +343,11 @@ class Engine
      *
      * @throws Mustache_Exception_InvalidArgumentException if $helpers is not an array or Traversable
      *
-     * @param array|Traversable $helpers
+     * @param array|\Traversable $helpers
      */
     public function setHelpers($helpers)
     {
-        if (!is_array($helpers) && !$helpers instanceof Traversable) {
+        if (!is_array($helpers) && !$helpers instanceof \Traversable) {
             throw new \Mustache_Exception_InvalidArgumentException('setHelpers expects an array of helpers');
         }
 
@@ -626,7 +626,7 @@ class Engine
             $key .= "\n" . $source;
         }
 
-        return $this->templateClassPrefix . md5($key);
+        return $this->templateClassPrefix . hash('md5', $key);
     }
 
     /**
@@ -649,14 +649,14 @@ class Engine
      *
      * @param string $name
      *
-     * @return Mustache_Template
+     * @return \Mustache_Template|null
      */
     public function loadPartial($name)
     {
         try {
             if (isset($this->partialsLoader)) {
                 $loader = $this->partialsLoader;
-            } elseif (isset($this->loader) && !$this->loader instanceof Mustache_Loader_StringLoader) {
+            } elseif (isset($this->loader) && !$this->loader instanceof \Mustache_Loader_StringLoader) {
                 $loader = $this->loader;
             } else {
                 throw new \Mustache_Exception_UnknownTemplateException($name);
@@ -670,6 +670,8 @@ class Engine
                 'Partial not found: "{name}"',
                 array('name' => $e->getTemplateName())
             );
+
+            return null;
         }
     }
 
