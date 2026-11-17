@@ -13,6 +13,8 @@ use Magento\Upward\Controller as UpwardController;
 use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Magento\UpwardConnector\Controller\UpwardControllerFactory;
+use Magento\UpwardConnector\Resolver\Computed;
+use Magento\UpwardConnector\Resolver\InternalService;
 
 class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,15 +46,19 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateWillReturn()
     {
-        $request = $this->createMock(RequestInterface::class);
-        $upwardControllerMock = $this->createMock(UpwardController::class);
+        $request = $this->createStub(RequestInterface::class);
+        $upwardControllerMock = $this->createStub(UpwardController::class);
         $upwardConfig = 'upward/config/path';
+        $additionalResolvers = [
+            Computed::RESOLVER_TYPE => Computed::class,
+            InternalService::RESOLVER_TYPE => InternalService::class
+        ];
         $this->pathManager->expects($this->once())
             ->method('getPath')
             ->willReturn($upwardConfig);
         $this->objectManager->expects($this->once())
             ->method('create')
-            ->with(UpwardController::class, compact('request', 'upwardConfig'))
+            ->with(UpwardController::class, compact('request', 'upwardConfig', 'additionalResolvers'))
             ->willReturn($upwardControllerMock);
 
         $this->assertSame($upwardControllerMock, $this->upwardControllerFactory->create($request));
@@ -60,7 +66,7 @@ class UpwardControllerFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateWillThrow()
     {
-        $requestMock = $this->createMock(RequestInterface::class);
+        $requestMock = $this->createStub(RequestInterface::class);
         $this->pathManager->expects($this->once())
             ->method('getPath')
             ->willReturn(null);

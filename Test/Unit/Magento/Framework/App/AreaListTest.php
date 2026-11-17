@@ -10,6 +10,7 @@ namespace Magento\UpwardConnector\Test\Unit\Magento\Framework\App;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\UpwardConnector\Api\UpwardPathManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Magento\Framework\App\AreaList;
 use Magento\UpwardConnector\Plugin\Magento\Framework\App\AreaList as AreaListPlugin;
 
@@ -37,11 +38,11 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp() : void
     {
-        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
-        $this->areaListMock = $this->createMock(\Magento\Framework\App\AreaList::class);
+        $this->scopeConfig = $this->createStub(ScopeConfigInterface::class);
+        $this->areaListMock = $this->createStub(AreaList::class);
 
         $this->pathManager = $this->createMock(UpwardPathManagerInterface::class);
-        $this->scopeConfig->expects($this->any())->method('getValue')->willReturn(
+        $this->scopeConfig->method('getValue')->willReturn(
             "foo\r\nbar"
         );
 
@@ -62,6 +63,7 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider afterGetCodeByFrontNameDataProvider
      */
+    #[DataProvider('afterGetCodeByFrontNameDataProvider')]
     public function testAfterGetCodeByFrontName(
         string $resultParam,
         string $frontNameParam,
@@ -72,6 +74,8 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
             $this->pathManager->expects($this->once())
                 ->method('getPath')
                 ->willReturn($upwardConfig);
+        } else {
+            $this->pathManager->expects($this->never())->method('getPath');
         }
 
         $result = $this->areaListPlugin->afterGetCodeByFrontName(
@@ -86,7 +90,7 @@ class AreaListTest extends \PHPUnit\Framework\TestCase
     /**
      * @return []
      */
-    public function afterGetCodeByFrontNameDataProvider()
+    public static function afterGetCodeByFrontNameDataProvider()
     {
         $upwardConfig = 'upward/config/path';
 

@@ -244,7 +244,7 @@ class Prerender
         return array_filter(
             array_map(
                 'trim',
-                preg_split("/(\r\n|\n)/", $list ?? '')
+                preg_split("/(\r\n|\n)/", $list)
             )
         );
     }
